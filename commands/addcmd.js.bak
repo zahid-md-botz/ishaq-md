@@ -1,0 +1,210 @@
+// commands/addcmd.js
+const fs = require('fs-extra');
+const path = require('path');
+
+const COMMANDS_FILE = path.join(__dirname, '../data/custom_commands.json');
+
+// Ensure file exists
+if (!fs.existsSync(COMMANDS_FILE)) {
+    fs.writeJsonSync(COMMANDS_FILE, {});
+}
+
+async function addcmdCommand(sock, chatId, message) {
+    try {
+        // Get sender
+        const sender = message.key.participant || message.key.remoteJid || '';
+        const ownerNumber = '923134158840@s.whatsapp.net';
+
+        // Owner check - Sirf yeh number chalega
+        if (sender !== ownerNumber) {
+            await sock.sendMessage(chatId, {
+                text: '❌ *Access Denied!*\n\nThis command is only for the Bot Owner.\n\n> 𝗜𝗦𝗛𝗔𝗤-𝑀𝐷-𝘮𝘪𝘯𝘪'
+            }, { quoted: message });
+            return;
+        }
+
+        // Get command text
+        const text = message.message?.conversation || 
+                    message.message?.extendedTextMessage?.text || '';
+        
+        const args = text.split(' ').slice(1);
+        
+        if (args.length < 2) {
+            await sock.sendMessage(chatId, {
+                text: `╭━━━〔 📝 *ADD COMMAND* 〕━━━┈⊷
+┃
+┃ ❌ *Usage:* .addcmd <name> <code>
+┃
+┃ 📌 *Example:*
+┃ .addcmd antivideo if(msg.message.videoMessage){await sock.sendMessage(from,{delete:msg.key});}
+┃
+┃ 📌 *Multiple Lines:*
+┃ .addcmd test console.log("test");
+┃
+┃ ⚠️ *Note:* Use semicolons for multiple statements
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━┈⊷`
+            }, { quoted: message });
+            return;
+        }
+
+        const cmdName = args[0].toLowerCase();
+        const cmdCode = args.slice(1).join(' ');
+
+        // Validate command name
+        if (!/^[a-zA-Z0-9_]+$/.test(cmdName)) {
+            await sock.sendMessage(chatId, {
+                text: '❌ *Invalid Command Name!*\n\nUse only letters, numbers, and underscores.\nExample: antivideo, vv_inbox, test_cmd'
+            }, { quoted: message });
+            return;
+        }
+
+        // Load existing commands
+        let commands = {};
+        if (fs.existsSync(COMMANDS_FILE)) {
+            commands = fs.readJsonSync(COMMANDS_FILE);
+        }
+
+        // Save command
+        commands[cmdName] = cmdCode;
+        fs.writeJsonSync(COMMANDS_FILE, commands);
+
+        await sock.sendMessage(chatId, {
+            text: `✅ *Command Added Successfully!*\n\n📝 *Name:* .${cmdName}\n📄 *Code:* ${cmdCode.substring(0, 50)}${cmdCode.length > 50 ? '...' : ''}\n\n🔹 *Usage:* .${cmdName}\n🔹 *Status:* Active for all users\n\n> 𝗜𝗦𝗛𝗔𝗤-𝑀𝐷-𝘮𝘪𝘯𝘪`
+        }, { quoted: message });
+
+    } catch (error) {
+        console.error('Addcmd Error:', error);
+        await sock.sendMessage(chatId, {
+            text: `❌ *Error Adding Command!*\n\n${error.message}`
+        }, { quoted: message });
+    }
+}
+
+// Function to execute custom command
+async function executeCustomCommand(sock, chatId, message, cmdName) {
+    try {
+        const commands = fs.readJsonSync(COMMANDS_FILE);
+        const cmdCode = commands[cmdName];
+        
+        if (!cmdCode) return false;
+
+        // Get message data
+        const from = chatId;
+        const msg = message;
+        const isGroup = chatId.endsWith('@g.us');
+        const sender = message.key.participant || message.key.remoteJid;
+        const text = message.message?.conversation || 
+                    message.message?.extendedTextMessage?.text || '';
+        const args = text.split(' ').slice(1);
+        const q = args.join(' ');
+
+        // Execute command safely
+        try {
+            // Create function from code
+            const fn = new Function('sock', 'from', 'msg', 'isGroup', 'sender', 'args', 'q', `
+                try {
+                    ${cmdCode}
+                } catch (err) {
+                    console.error('Custom command error:', err);
+                    await sock.sendMessage(from, { 
+                        text: '❌ Command execution error: ' + err.message 
+                    }, { quoted: msg });
+                }
+            `);
+            
+            await fn(sock, from, msg, isGroup, sender, args, q);
+            return true;
+        } catch (err) {
+            console.error('Custom command execution error:', err);
+            await sock.sendMessage(chatId, {
+                text: `❌ *Command Execution Error!*\n\n${err.message}\n\nPlease check command code.`
+            }, { quoted: message });
+            return false;
+        }
+
+    } catch (error) {
+        console.error('Execute custom command error:', error);
+        return false;
+    }
+}
+
+// Function to list all custom commands
+async function listCustomCommands(sock, chatId, message) {
+    try {
+        const commands = fs.readJsonSync(COMMANDS_FILE);
+        const cmdList = Object.keys(commands);
+        
+        if (cmdList.length === 0) {
+            await sock.sendMessage(chatId, {
+                text: '📭 *No custom commands added yet!*\n\nUse .addcmd to add new commands.'
+            }, { quoted: message });
+            return;
+        }
+
+        let list = `╭━━━〔 📋 *CUSTOM COMMANDS* 〕━━━┈⊷\n┃\n`;
+        for (const cmd of cmdList) {
+            const code = commands[cmd];
+            const preview = code.substring(0, 30) + (code.length > 30 ? '...' : '');
+            list += `┃ 🔹 *.*${cmd}\n┃ 📄 ${preview}\n┃\n`;
+        }
+        list += `╰━━━━━━━━━━━━━━━━━━━━━━━━━━━┈⊷\n\n> Total: ${cmdList.length} commands`;
+
+        await sock.sendMessage(chatId, { text: list }, { quoted: message });
+    } catch (error) {
+        console.error('List commands error:', error);
+        await sock.sendMessage(chatId, {
+            text: '❌ Error listing commands!'
+        }, { quoted: message });
+    }
+}
+
+// Function to delete custom command
+async function deleteCustomCommand(sock, chatId, message, args) {
+    try {
+        const sender = message.key.participant || message.key.remoteJid || '';
+        const ownerNumber = '923134158840@s.whatsapp.net';
+
+        if (sender !== ownerNumber) {
+            await sock.sendMessage(chatId, {
+                text: '❌ *Access Denied!* Only owner can delete commands.'
+            }, { quoted: message });
+            return;
+        }
+
+        const cmdName = args[0]?.toLowerCase();
+        if (!cmdName) {
+            await sock.sendMessage(chatId, {
+                text: '❌ *Usage:* .delcmd <command_name>'
+            }, { quoted: message });
+            return;
+        }
+
+        const commands = fs.readJsonSync(COMMANDS_FILE);
+        if (!commands[cmdName]) {
+            await sock.sendMessage(chatId, {
+                text: `❌ Command ".${cmdName}" not found!`
+            }, { quoted: message });
+            return;
+        }
+
+        delete commands[cmdName];
+        fs.writeJsonSync(COMMANDS_FILE, commands);
+
+        await sock.sendMessage(chatId, {
+            text: `✅ *Command Deleted!*\n\n📝 .${cmdName} has been removed.`
+        }, { quoted: message });
+    } catch (error) {
+        console.error('Delete command error:', error);
+        await sock.sendMessage(chatId, {
+            text: '❌ Error deleting command!'
+        }, { quoted: message });
+    }
+}
+
+module.exports = {
+    addcmdCommand,
+    executeCustomCommand,
+    listCustomCommands,
+    deleteCustomCommand
+};
