@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>𝗜𝗦𝗛𝗔𝗤-𝑀𝐷-𝘮𝘪𝘯𝘪 | WhatsApp Bot Panel</title>
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <style>
+        /* ----- RESET & BASE ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0b0f1a;
+            color: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* ----- FULLSCREEN BACKGROUND IMAGE (with overlay) ----- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://files.catbox.moe/ooexin.png') no-repeat center center / cover;
+            z-index: 0;
+            filter: brightness(0.3) saturate(0.6);
+        }
+
+        /* ----- DARK OVERLAY GRADIENT (for readability) ----- */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 12, 25, 0.75);
+            backdrop-filter: blur(2px);
+            z-index: 1;
+        }
+
+        /* ----- MAIN CONTAINER (above overlay) ----- */
+        .main-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        /* ----- GLASS CARD ----- */
+        .glass-card {
+            background: rgba(18, 26, 45, 0.72);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border-radius: 36px;
+            padding: 30px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        /* ----- HEADER WITH LOGO ----- */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .brand-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #6c5ce7, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(108, 92, 231, 0.35);
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #c084fc, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+            margin-left: auto;
+            background: rgba(255,255,255,0.04);
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* ----- STATS CARD ----- */
+        .stats-card {
+            background: linear-gradient(145deg, rgba(108, 92, 231, 0.18), rgba(168, 85, 247, 0.10));
+            border-radius: 24px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .stats-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #c084fc;
+            line-height: 1.1;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+        }
+
+        .stats-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* ----- INPUT & BUTTON ----- */
+        .input-group-custom {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 4px;
+            transition: border 0.25s;
+        }
+
+        .input-group-custom:focus-within {
+            border-color: rgba(168, 85, 247, 0.4);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.08);
+        }
+
+        .input-group-custom input {
+            background: transparent;
+            border: none;
+            padding: 14px 18px;
+            color: #f0f4ff;
+            font-size: 1rem;
+            outline: none;
+            width: 100%;
+        }
+
+        .input-group-custom input::placeholder {
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .btn-primary-glow {
+            background: linear-gradient(135deg, #6c5ce7, #a855f7);
+            border: none;
+            border-radius: 14px;
+            padding: 12px 26px;
+            font-weight: 700;
+            color: #fff;
+            transition: all 0.25s;
+            box-shadow: 0 8px 24px rgba(108, 92, 231, 0.30);
+            white-space: nowrap;
+        }
+
+        .btn-primary-glow:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 32px rgba(108, 92, 231, 0.45);
+            background: linear-gradient(135deg, #7c6cf7, #b865ff);
+            color: #fff;
+        }
+
+        .btn-primary-glow:disabled {
+            opacity: 0.5;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ----- STATUS BADGE ----- */
+        .status-badge {
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        .status-connected {
+            background: #10b98120;
+            color: #34d399;
+            border: 1px solid #10b98140;
+        }
+        .status-disconnected {
+            background: #ef444420;
+            color: #f87171;
+            border: 1px solid #ef444440;
+        }
+
+        /* ----- CONSOLE ----- */
+        .console-box {
+            background: #05080f;
+            border-radius: 18px;
+            padding: 16px 18px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: #a5f3c0;
+            border: 1px solid rgba(255,255,255,0.04);
+            line-height: 1.7;
+            margin-top: 12px;
+        }
+
+        .console-box::-webkit-scrollbar {
+            width: 5px;
+        }
+        .console-box::-webkit-scrollbar-track {
+            background: #0f1422;
+        }
+        .console-box::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+
+        .log-time {
+            color: #64748b;
+            margin-right: 10px;
+        }
+
+        /* ----- PROGRESS BAR (pairing) ----- */
+        .progress-container {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border-radius: 40px;
+            margin-top: 16px;
+            display: none;
+            overflow: hidden;
+            height: 6px;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #6c5ce7, #a855f7);
+            border-radius: 40px;
+            transition: width 0.5s ease;
+        }
+
+        .loading-text {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 600px) {
+            .glass-card { padding: 22px 16px; }
+            .brand-text { font-size: 1.3rem; }
+            .stats-number { font-size: 2.2rem; }
+            .brand-sub { font-size: 0.6rem; padding: 4px 10px; }
+            .btn-primary-glow { padding: 10px 18px; font-size: 0.9rem; }
+        }
+
+        /* hidden utility */
+        .hidden { display: none !important; }
+    </style>
+</head>
+
+<body>
+
+<div class="main-wrapper">
+
+    <!-- MAIN CARD -->
+    <div class="glass-card">
+
+        <!-- HEADER -->
+        <div class="brand-header">
+            <div class="brand-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <span class="brand-text">𝗜𝗦𝗛𝗔𝗤-𝑀𝐷-𝘮𝘪𝘯𝘪</span>
+            <span class="brand-sub"><i class="fas fa-circle" style="color:#34d399; font-size:0.5rem; margin-right:4px;"></i> v2.0</span>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-card">
+            <div class="stats-number" id="totalActive">0</div>
+            <div class="stats-label"><i class="fas fa-bolt me-1"></i> TOTAL BOT ACTIVE</div>
+        </div>
+
+        <!-- ========== SECTION: CREATE / SELECT ========== -->
+        <div id="setupSection">
+            <div style="background: rgba(255,255,255,0.02); border-radius: 20px; padding: 18px 16px; border: 1px solid rgba(255,255,255,0.04);">
+                <h6 style="font-weight: 700; margin-bottom: 12px; color: #cbd5e1;">
+                    <i class="fas fa-plus-circle me-2" style="color:#a855f7;"></i>CREATE BOT
+                </h6>
+                <div class="input-group-custom d-flex align-items-center">
+                    <input type="text" id="userIdInput" placeholder="Enter unique bot name (e.g., MyBot1)" />
+                    <button class="btn-primary-glow" onclick="selectUser()" style="border-radius: 14px; padding: 10px 20px; margin: 4px;">
+                        <i class="fas fa-arrow-right me-1"></i> SELECT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== DASHBOARD (hidden initially) ========== -->
+        <div id="userDashboard" class="hidden" style="margin-top: 18px;">
+
+            <!-- STAGE 1: Pairing -->
+            <div id="stage1">
+                <div style="background: rgba(255,255,255,0.02); border-radius: 20px; padding: 18px 16px; border: 1px solid rgba(255,255,255,0.04);">
+                    <h6 style="font-weight: 700; color: #cbd5e1;">
+                        <i class="fas fa-link me-2" style="color:#a855f7;"></i>PAIRING CODE
+                    </h6>
+                    <div class="mb-3">
+                        <label class="form-label" style="font-size:0.8rem; color:#94a3b8;">WhatsApp Number (with country code)</label>
+                        <input type="tel" class="form-control" id="pairNumber" placeholder="923134158840" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:#f0f4ff; border-radius:14px; padding:12px 16px;" />
+                    </div>
+                    <button class="btn-primary-glow w-100" id="pairBtn" style="justify-content:center;">
+                        <i class="fas fa-key me-2"></i> GENERATE CODE
+                    </button>
+
+                    <!-- Progress Bar -->
+                    <div id="progressContainer" class="progress-container">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                    <div id="loadingText" class="loading-text hidden">⏳ Connecting to WhatsApp... Please wait.</div>
+
+                    <div id="pairingResult" class="mt-3 text-center h5" style="color: #fbbf24; font-weight: 600; word-break: break-all;"></div>
+                </div>
+            </div>
+
+            <!-- STAGE 2: Connected -->
+            <div id="stage2" class="hidden" style="margin-top: 16px;">
+                <div style="background: rgba(255,255,255,0.02); border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.04); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                    <div>
+                        <span id="connectionStatus" class="status-badge status-disconnected">DISCONNECTED</span>
+                        <span class="ms-2" id="activeBotName" style="font-weight:600; color:#e2e8f0;">Bot: --</span>
+                    </div>
+                    <button class="btn btn-danger btn-sm" id="logoutBtn" style="border-radius:40px; padding:6px 18px; background:#ef4444; border:none; font-weight:600;">
+                        <i class="fas fa-sign-out-alt me-1"></i> LOGOUT
+                    </button>
+                </div>
+
+                <div style="margin-top: 16px; background: rgba(255,255,255,0.02); border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.04);">
+                    <h6 style="font-weight: 700; color: #cbd5e1;">
+                        <i class="fas fa-terminal me-2" style="color:#a855f7;"></i>LIVE CONSOLE
+                    </h6>
+                    <div class="console-box" id="console">
+                        <div><span class="log-time">[system]</span> Waiting for logs...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div style="margin-top: 28px; text-align: center; font-size: 0.65rem; color: #475569; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 18px; letter-spacing: 0.3px;">
+            <i class="fas fa-shield-alt me-1" style="color:#334155;"></i> 
+            <span style="color:#64748b;">Powered by</span> 
+            <span style="color:#a78bfa; font-weight:600;">𝗜𝗦𝗛𝗔𝗤-𝑀𝐷-𝘮𝘪𝘯𝘪</span> 
+            <span style="color:#475569;">• 24/7 Automation</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+    const socket = io();
+    let currentUserId = null;
+
+    // ----- SELECT USER -----
+    function selectUser() {
+        const userId = document.getElementById('userIdInput').value.trim();
+        if (!userId) return alert('Please enter a bot name.');
+        currentUserId = userId;
+        socket.emit('set-user', userId);
+        document.getElementById('activeBotName').innerText = 'Bot: ' + userId;
+        document.getElementById('userDashboard').classList.remove('hidden');
+        document.getElementById('stage1').classList.remove('hidden');
+        document.getElementById('stage2').classList.add('hidden');
+        document.getElementById('pairingResult').innerText = '';
+        document.getElementById('progressContainer').style.display = 'none';
+        document.getElementById('loadingText').classList.add('hidden');
+    }
+
+    // ----- TOTAL ACTIVE -----
+    socket.on('total-active', (count) => {
+        document.getElementById('totalActive').innerText = count;
+    });
+
+    // ----- PAIRING CODE -----
+    socket.on('pairing-code', (code) => {
+        document.getElementById('progressContainer').style.display = 'none';
+        document.getElementById('loadingText').classList.add('hidden');
+        document.getElementById('pairingResult').innerText = '🔑 YOUR CODE: ' + code;
+        document.getElementById('pairBtn').disabled = false;
+        document.getElementById('pairBtn').innerHTML = '<i class="fas fa-key me-2"></i> GENERATE CODE';
+        isPairing = false;
+    });
+
+    // ----- CONSOLE LOGS -----
+    socket.on('console', (log) => {
+        const consoleDiv = document.getElementById('console');
+        const entry = document.createElement('div');
+        entry.innerHTML = `<span class="log-time">[${log.timestamp}]</span> ${log.message}`;
+        consoleDiv.appendChild(entry);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        if (consoleDiv.children.length > 150) {
+            consoleDiv.removeChild(consoleDiv.firstChild);
+        }
+    });
+
+    // ----- CONNECTION STATUS -----
+    socket.on('connection-status', (status) => {
+        const badge = document.getElementById('connectionStatus');
+        if (status.connected) {
+            badge.className = 'status-badge status-connected';
+            badge.innerText = '✅ CONNECTED';
+            document.getElementById('stage1').classList.add('hidden');
+            document.getElementById('stage2').classList.remove('hidden');
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('loadingText').classList.add('hidden');
+            document.getElementById('pairBtn').disabled = false;
+            document.getElementById('pairBtn').innerHTML = '<i class="fas fa-key me-2"></i> GENERATE CODE';
+            isPairing = false;
+        } else {
+            badge.className = 'status-badge status-disconnected';
+            badge.innerText = '❌ DISCONNECTED';
+        }
+    });
+
+    // ----- PAIR BUTTON -----
+    let isPairing = false;
+    document.getElementById('pairBtn').onclick = () => {
+        if (isPairing) return;
+        const number = document.getElementById('pairNumber').value.trim();
+        if (!number) return alert('Please enter a WhatsApp number.');
+
+        isPairing = true;
+        document.getElementById('pairBtn').disabled = true;
+        document.getElementById('pairBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> REQUESTING...';
+
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const loadingText = document.getElementById('loadingText');
+        const pairingResult = document.getElementById('pairingResult');
+
+        pairingResult.innerText = '';
+        progressContainer.style.display = 'block';
+        loadingText.classList.remove('hidden');
+        progressBar.style.width = '0%';
+
+        let width = 0;
+        const interval = setInterval(() => {
+            if (width >= 90) {
+                clearInterval(interval);
+            } else {
+                width += 2;
+                progressBar.style.width = width + '%';
+            }
+        }, 120);
+
+        socket.emit('pair-request', { userId: currentUserId, number });
+
+        // Safety timeout to re-enable button
+        setTimeout(() => {
+            if (isPairing) {
+                isPairing = false;
+                document.getElementById('pairBtn').disabled = false;
+                document.getElementById('pairBtn').innerHTML = '<i class="fas fa-key me-2"></i> GENERATE CODE';
+                progressContainer.style.display = 'none';
+                loadingText.classList.add('hidden');
+                if (!pairingResult.innerText) {
+                    pairingResult.innerText = '⏳ Request timed out. Please try again.';
+                }
+            }
+        }, 18000);
+    };
+
+    // ----- LOGOUT -----
+    document.getElementById('logoutBtn').onclick = () => {
+        if (!currentUserId) return;
+        socket.emit('logout', currentUserId);
+        document.getElementById('userDashboard').classList.add('hidden');
+        document.getElementById('stage1').classList.add('hidden');
+        document.getElementById('stage2').classList.add('hidden');
+        document.getElementById('setupSection').classList.remove('hidden');
+        document.getElementById('pairingResult').innerText = '';
+        document.getElementById('progressContainer').style.display = 'none';
+        document.getElementById('loadingText').classList.add('hidden');
+        document.getElementById('activeBotName').innerText = 'Bot: --';
+        document.getElementById('connectionStatus').className = 'status-badge status-disconnected';
+        document.getElementById('connectionStatus').innerText = '❌ DISCONNECTED';
+    };
+
+    // Auto-show setup if user reloads
+    window.onload = function() {
+        document.getElementById('setupSection').classList.remove('hidden');
+    };
+</script>
+
+</body>
+</html>
