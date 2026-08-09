@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ISHAQ-MD · Admin Panel</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   ISHAQ-MD Admin Panel — Full Glassmorphism Dark/Light Theme
+   ═══════════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#07090f;
+  --bg2:#0d1020;
+  --sidebar:rgba(9,12,24,.97);
+  --card:rgba(255,255,255,.04);
+  --card2:rgba(255,255,255,.07);
+  --glass:rgba(255,255,255,.06);
+  --gb:rgba(255,255,255,.1);
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.13);
+  --g:#22d65f;
+  --gd:rgba(34,214,95,.13);
+  --g2:#128c7e;
+  --b:#3d8ef8;
+  --bd:rgba(61,142,248,.13);
+  --r:#f5536a;
+  --rd:rgba(245,83,106,.13);
+  --y:#f5b942;
+  --yd:rgba(245,185,66,.13);
+  --p:#9d6cf5;
+  --pd:rgba(157,108,245,.13);
+  --c:#22d8f5;
+  --cd:rgba(34,216,245,.13);
+  --o:#f5813d;
+  --od:rgba(245,129,61,.13);
+  --text:#e8ecf4;
+  --muted:#3e4860;
+  --muted2:#7080a0;
+  --sh:0 8px 32px rgba(0,0,0,.45);
+  --sh2:0 20px 60px rgba(0,0,0,.6);
+  --tr:all .22s cubic-bezier(.4,0,.2,1);
+  --term-bg:#020608;
+  --term-text:#c0ffd4;
+}
+
+[data-theme="light"]{
+  --bg:#eef1f8;
+  --bg2:#e4e8f4;
+  --sidebar:rgba(236,240,252,.98);
+  --card:rgba(255,255,255,.8);
+  --card2:rgba(255,255,255,.95);
+  --glass:rgba(255,255,255,.7);
+  --gb:rgba(0,0,0,.08);
+  --border:rgba(0,0,0,.07);
+  --border2:rgba(0,0,0,.13);
+  --g:#16a34a;
+  --gd:rgba(22,163,74,.1);
+  --g2:#15803d;
+  --b:#2563eb;
+  --bd:rgba(37,99,235,.1);
+  --r:#dc2626;
+  --rd:rgba(220,38,38,.1);
+  --y:#d97706;
+  --yd:rgba(217,119,6,.1);
+  --p:#7c3aed;
+  --pd:rgba(124,58,237,.1);
+  --c:#0891b2;
+  --cd:rgba(8,145,178,.1);
+  --o:#ea580c;
+  --od:rgba(234,88,12,.1);
+  --text:#1a2035;
+  --muted:#c0c8d8;
+  --muted2:#64748b;
+  --sh:0 4px 20px rgba(0,0,0,.08);
+  --sh2:0 12px 40px rgba(0,0,0,.13);
+  --term-bg:#f0f4f0;
+  --term-text:#1a4f2a;
+}
+
+html,body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition:background .3s,color .3s;
+}
+
+/* ── Fullscreen Background Image ── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://files.catbox.moe/ooexin.png') no-repeat center center / cover;
+  z-index: 0;
+  filter: brightness(0.25) saturate(0.5);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 12, 25, 0.75);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+/* ══ LOGIN ════════════════════════════════════════════ */
+#loginPage{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  z-index:10;
+}
+.lbox{width:100%;max-width:400px;padding:20px;}
+.lcard{
+  background:var(--glass);
+  backdrop-filter:blur(32px);
+  -webkit-backdrop-filter:blur(32px);
+  border:1px solid var(--gb);
+  border-radius:28px;
+  padding:46px 38px;
+  box-shadow:var(--sh2);
+  animation:popIn .55s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes popIn{
+  from{opacity:0;transform:scale(.88) translateY(24px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+.llogo{
+  width:82px;height:82px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  border-radius:22px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:38px;color:#fff;
+  animation:lpulse 2.8s ease-in-out infinite;
+  transform:rotate(-6deg);
+}
+@keyframes lpulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(34,214,95,.4);}
+  60%{box-shadow:0 0 0 22px rgba(34,214,95,0);}
+}
+.ltitle{font-size:27px;font-weight:700;text-align:center;color:#fff;letter-spacing:-.5px;}
+.lsub{font-size:12.5px;color:var(--muted2);text-align:center;margin:4px 0 28px;}
+.lf{position:relative;margin-bottom:14px;}
+.lic{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:14px;}
+.linp{
+  width:100%;padding:14px 14px 14px 44px;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid var(--gb);
+  border-radius:14px;font-size:14px;font-family:inherit;
+  color:var(--text);transition:var(--tr);
+}
+.linp::placeholder{color:var(--muted2);}
+.linp:focus{
+  outline:none;border-color:var(--g);
+  background:rgba(255,255,255,.09);
+  box-shadow:0 0 0 4px rgba(34,214,95,.12);
+}
+.lbtn{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  border:none;border-radius:14px;
+  color:#fff;font-family:inherit;font-size:15px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:9px;transition:var(--tr);
+}
+.lbtn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(34,214,95,.35);}
+.lerr{color:var(--r);font-size:13px;text-align:center;margin-top:12px;padding:10px;background:var(--rd);border-radius:10px;display:none;}
+
+/* ══ PANEL ════════════════════════════════════════════ */
+#adminPage{
+  display:none;
+  min-height:100vh;
+  position:relative;
+  z-index:5;
+}
+
+/* ── Sidebar ──────────────────────────────────────── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:246px;
+  background:var(--sidebar);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  z-index:300;overflow:hidden;
+  transition:transform .3s;
+}
+.sbh{padding:22px 16px 16px;border-bottom:1px solid var(--border);}
+.sblogo{display:flex;align-items:center;gap:11px;}
+.sbic{
+  width:43px;height:43px;flex-shrink:0;border-radius:13px;
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:21px;color:#fff;box-shadow:0 4px 14px rgba(34,214,95,.28);
+}
+.sbn{font-size:15.5px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.sbv{font-size:11px;color:var(--muted2);margin-top:1px;display:flex;align-items:center;gap:5px;}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:lp 1.6s ease-in-out infinite;flex-shrink:0;}
+@keyframes lp{0%,100%{opacity:1;}50%{opacity:.25;}}
+.nav{flex:1;padding:10px 8px;overflow-y:auto;}
+.ns{font-size:9.5px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted2);padding:10px 10px 4px;white-space:nowrap;}
+.ni{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:11px;
+  color:var(--muted2);cursor:pointer;font-size:13px;font-weight:500;
+  transition:var(--tr);margin-bottom:1px;white-space:nowrap;position:relative;
+}
+.ni::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--g);border-radius:0 4px 4px 0;
+  transform:scaleY(0);transition:transform .2s;
+}
+.ni:hover{color:var(--text);background:var(--glass);}
+.ni.active{color:var(--g);background:var(--gd);}
+.ni.active::before{transform:scaleY(1);}
+.ni i{width:17px;font-size:13px;flex-shrink:0;text-align:center;}
+.nbadge{margin-left:auto;background:var(--g);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.nbadge.red{background:var(--r);}
+.sbf{padding:10px 10px 14px;border-top:1px solid var(--border);}
+.sbacts{display:flex;gap:6px;margin-bottom:8px;}
+.sbab{
+  flex:1;padding:9px 6px;border-radius:10px;
+  border:1px solid var(--border);background:var(--glass);
+  color:var(--muted2);cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  gap:5px;transition:var(--tr);font-family:inherit;
+}
+.sbab:hover{background:var(--card2);color:var(--text);}
+.logout{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:11px;
+  color:var(--r);cursor:pointer;font-size:13px;font-weight:600;
+  transition:var(--tr);
+}
+.logout:hover{background:var(--rd);}
+
+/* ── Topbar ──────────────────────────────────────── */
+.topbar{
+  position:fixed;top:0;left:246px;right:0;height:58px;
+  background:var(--sidebar);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:14px;
+  z-index:200;transition:left .3s;
+}
+.topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1;}
+.topbar-icon{
+  width:34px;height:34px;border-radius:9px;
+  border:1px solid var(--border);background:var(--glass);
+  color:var(--muted2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:var(--tr);
+}
+.topbar-icon:hover{background:var(--card2);color:var(--text);}
+.hamburger{display:none;}
+
+/* ── Main ────────────────────────────────────────── */
+.main{
+  margin-left:246px;
+  padding:74px 24px 300px;
+  min-height:100vh;
+  transition:margin-left .3s;
+}
+.page{display:none;}
+.page.active{display:block;animation:psl .28s cubic-bezier(.4,0,.2,1);}
+@keyframes psl{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.4px;}
+.section-sub{font-size:12.5px;color:var(--muted2);margin-top:3px;}
+.phdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;}
+
+/* ── Cards ──────────────────────────────────────── */
+.card{
+  background:var(--card);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--border);
+  border-radius:18px;padding:22px;margin-bottom:20px;
+  transition:var(--tr);
+}
+.card:hover{border-color:var(--border2);}
+.card-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* ── Stats grid ─────────────────────────────────── */
+.sgrid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:14px;margin-bottom:20px;
+}
+.stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:18px;transition:var(--tr);cursor:default;
+}
+.stat:hover{transform:translateY(-2px);box-shadow:var(--sh);}
+.sti{
+  width:40px;height:40px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;float:right;
+}
+.sti.g{background:var(--gd);color:var(--g);}
+.sti.b{background:var(--bd);color:var(--b);}
+.sti.r{background:var(--rd);color:var(--r);}
+.sti.p{background:var(--pd);color:var(--p);}
+.sti.y{background:var(--yd);color:var(--y);}
+.sti.c{background:var(--cd);color:var(--c);}
+.stv{font-size:27px;font-weight:700;color:#fff;line-height:1;clear:both;}
+.stl{font-size:11.5px;color:var(--muted2);margin-top:5px;}
+
+/* ── Form ───────────────────────────────────────── */
+.fg{margin-bottom:15px;}
+.fl{display:block;font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;}
+.fi{
+  width:100%;padding:12px 15px;
+  background:rgba(255,255,255,.05);
+  border:1.5px solid var(--border);
+  border-radius:12px;font-size:14px;font-family:inherit;
+  color:var(--text);transition:var(--tr);
+}
+.fi::placeholder{color:var(--muted2);}
+.fi:focus{
+  outline:none;border-color:var(--g);
+  background:rgba(255,255,255,.07);
+  box-shadow:0 0 0 4px rgba(34,214,95,.1);
+}
+textarea.fi{resize:vertical;min-height:88px;line-height:1.6;}
+select.fi{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237080a0' viewBox='0 0 20 20'%3E%3Cpath d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+  background-size:18px;padding-right:40px;
+}
+select.fi option{background:#0d1020;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:600px){.two,.three{grid-template-columns:1fr;}}
+.sep{height:1px;background:var(--border);margin:16px 0;}
+
+/* ── Buttons ────────────────────────────────────── */
+.btn{
+  padding:10px 18px;border-radius:12px;border:none;
+  font-family:inherit;font-size:13.5px;font-weight:600;
+  cursor:pointer;display:inline-flex;align-items:center;
+  gap:8px;transition:var(--tr);
+}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn-g{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;}
+.btn-g:hover{box-shadow:0 8px 22px rgba(34,214,95,.35);}
+.btn-b{background:linear-gradient(135deg,var(--b),#1d4ed8);color:#fff;}
+.btn-b:hover{box-shadow:0 8px 22px rgba(61,142,248,.35);}
+.btn-r{background:linear-gradient(135deg,var(--r),#b91c1c);color:#fff;}
+.btn-r:hover{box-shadow:0 8px 22px rgba(245,83,106,.3);}
+.btn-p{background:linear-gradient(135deg,var(--p),#6d28d9);color:#fff;}
+.btn-y{background:linear-gradient(135deg,var(--y),#b45309);color:#fff;}
+.btn-o{background:linear-gradient(135deg,var(--o),#c2410c);color:#fff;}
+.btn-c{background:linear-gradient(135deg,var(--c),#0891b2);color:#fff;}
+.btn-ghost{background:var(--glass);border:1px solid var(--border);color:var(--text);}
+.btn-ghost:hover{background:var(--card2);}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:9px;}
+.btn-full{width:100%;justify-content:center;padding:13px;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* ── Badges ────────────────────────────────────── */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+.badge-green{background:var(--gd);color:var(--g);}
+.badge-red{background:var(--rd);color:var(--r);}
+.badge-blue{background:var(--bd);color:var(--b);}
+.badge-yellow{background:var(--yd);color:var(--y);}
+.badge-muted{background:rgba(255,255,255,.06);color:var(--muted2);}
+
+/* ── Table ─────────────────────────────────────── */
+.tw{overflow-x:auto;border-radius:12px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--border);}
+th{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.7px;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+
+/* ── Alert ─────────────────────────────────────── */
+.alert{padding:11px 14px;border-radius:11px;font-size:13px;margin-top:12px;display:none;transition:var(--tr);}
+.alert.show{display:block;}
+.alert-success{background:var(--gd);color:var(--g);border:1px solid rgba(34,214,95,.2);}
+.alert-error{background:var(--rd);color:var(--r);border:1px solid rgba(245,83,106,.2);}
+.alert-info{background:var(--bd);color:var(--b);border:1px solid rgba(61,142,248,.2);}
+
+/* ── Result box ─────────────────────────────────── */
+.result-box{
+  background:rgba(0,0,0,.3);
+  border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;
+  color:var(--g);white-space:pre-wrap;
+  margin-top:12px;max-height:200px;overflow-y:auto;
+  display:none;
+}
+.result-box.show{display:block;}
+
+/* ── Emoji grid ─────────────────────────────────── */
+.emoji-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.emoji-btn{
+  padding:8px 10px;border:1.5px solid var(--border);
+  border-radius:9px;font-size:20px;cursor:pointer;
+  transition:var(--tr);background:var(--glass);user-select:none;
+}
+.emoji-btn:hover,.emoji-btn.selected{border-color:var(--g);background:var(--gd);transform:scale(1.12);}
+
+/* ── Activity feed ─────────────────────────────── */
+.activity-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.activity-content{flex:1;min-width:0;}
+.activity-action{font-size:13px;font-weight:600;color:var(--text);}
+.activity-detail{font-size:12px;color:var(--muted2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.activity-time{font-size:11px;color:var(--muted2);flex-shrink:0;}
+
+/* ── View-Once Gallery ─────────────────────────── */
+.vo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+.vo-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:var(--tr);}
+.vo-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.vo-thumb{width:100%;height:120px;object-fit:cover;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:36px;}
+.vo-info{padding:12px;}
+.vo-type{font-size:11px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.5px;}
+.vo-from{font-size:12px;color:var(--muted2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vo-size{font-size:11px;color:var(--muted);margin-top:2px;}
+.vo-actions{display:flex;gap:7px;margin-top:10px;}
+
+/* ══ LIVE TERMINAL ═══════════════════════════════════ */
+#terminalBar{
+  position:fixed;bottom:0;left:246px;right:0;z-index:400;
+  background:var(--term-bg);
+  border-top:1px solid rgba(34,214,95,.15);
+  display:flex;flex-direction:column;
+  transition:left .3s,height .3s cubic-bezier(.4,0,.2,1);
+  height:260px;
+}
+#terminalBar.collapsed{height:38px;}
+.term-hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 14px;border-bottom:1px solid rgba(34,214,95,.1);
+  flex-shrink:0;background:rgba(0,0,0,.25);
+  cursor:pointer;user-select:none;
+}
+.term-dots{display:flex;gap:5px;flex-shrink:0;}
+.tdot{width:11px;height:11px;border-radius:50%;}
+.tdot.r{background:#ff5f57;}
+.tdot.y{background:#febc2e;}
+.tdot.g{background:#28c840;}
+.term-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--g);flex:1;}
+.term-conn{font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:2px 10px;border-radius:20px;border:1px solid currentColor;}
+.term-conn.connected{color:var(--g);}
+.term-conn.disconnected{color:var(--r);}
+.term-btns{display:flex;gap:6px;}
+.tbtn{width:26px;height:22px;border-radius:6px;border:1px solid rgba(34,214,95,.2);background:transparent;color:var(--g);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:inherit;transition:var(--tr);}
+.tbtn:hover{background:rgba(34,214,95,.1);}
+.term-body{flex:1;overflow-y:auto;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;}
+.terminal-line{display:flex;gap:8px;padding:1px 0;animation:fadeIn .15s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.t-time{color:#3a6a4a;flex-shrink:0;font-size:10.5px;margin-top:1px;}
+.t-type{flex-shrink:0;padding:0 5px;border-radius:4px;font-size:10px;font-weight:700;height:16px;margin-top:2px;}
+.t-type.group{background:rgba(61,142,248,.15);color:var(--b);}
+.t-type.private{background:rgba(34,214,95,.12);color:var(--g);}
+.t-type.channel{background:rgba(157,108,245,.15);color:var(--p);}
+.t-type.out{background:rgba(245,185,66,.12);color:var(--y);}
+.t-type.alert{background:rgba(245,83,106,.15);color:var(--r);animation:alertPulse .6s ease 3;}
+.t-type.system{background:rgba(34,216,245,.12);color:var(--c);}
+.t-type.view-once{background:rgba(245,129,61,.15);color:var(--o);}
+@keyframes alertPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.t-sender{color:var(--y);flex-shrink:0;font-size:11.5px;}
+.t-content{color:var(--term-text);flex:1;word-break:break-all;font-size:11.5px;}
+.terminal-empty{color:#2a5040;font-style:italic;text-align:center;padding:24px;font-size:12px;}
+
+/* ── Toast container ───────────────────────────── */
+#toastContainer{position:fixed;top:70px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{
+  background:var(--glass);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--gb);border-radius:14px;
+  padding:12px 16px;box-shadow:var(--sh2);
+  display:flex;align-items:center;gap:10px;
+  min-width:240px;max-width:360px;font-size:13.5px;font-weight:500;
+  color:var(--text);pointer-events:auto;animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(60px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(60px);}}
+.toast-success{border-color:rgba(34,214,95,.3);}
+.toast-error{border-color:rgba(245,83,106,.3);}
+.toast-info{border-color:rgba(61,142,248,.3);}
+.toast-warning{border-color:rgba(245,185,66,.3);}
+
+/* ── Overlay ──────────────────────────────────── */
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:250;}
+#overlay.show{display:block;}
+
+/* ── Password Change Modal ────────────────────── */
+.modal{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;
+}
+.modal.show{display:flex;}
+.modal-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:24px;padding:32px;max-width:420px;width:100%;
+  box-shadow:var(--sh2);animation:popIn .4s ease;
+}
+.modal-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;}
+.modal-sub{font-size:13px;color:var(--muted2);margin-bottom:20px;}
+.modal-close{float:right;background:none;border:none;color:var(--muted2);font-size:20px;cursor:pointer;}
+.modal-close:hover{color:var(--text);}
+
+/* ── Mobile ───────────────────────────────────── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .topbar{left:0;}
+  .topbar-title{font-size:14px;}
+  .main{margin-left:0;padding:70px 14px 280px;}
+  #terminalBar{left:0;}
+  .hamburger{display:flex;}
+}
+@media(max-width:480px){.sgrid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<!-- ══ LOGIN ═══════════════════════════════════════════ -->
+<div id="loginPage" class="login-container">
+  <div class="lbox">
+    <div class="lcard">
+      <div class="llogo"><i class="fab fa-whatsapp"></i></div>
+      <div class="ltitle">ISHAQ-MD</div>
+      <div class="lsub">Admin Control Panel v6.1</div>
+      <div class="lf"><i class="fas fa-user lic"></i><input class="linp" id="loginUser" type="text" placeholder="Username" autocomplete="username"/></div>
+      <div class="lf"><i class="fas fa-lock lic"></i><input class="linp" id="loginPass" type="password" placeholder="Password" autocomplete="current-password"/></div>
+      <button class="lbtn" onclick="doLogin()"><i class="fas fa-terminal"></i> Access Panel</button>
+      <div class="lerr" id="loginErr">Invalid credentials</div>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="#" onclick="showChangePassword()" style="color:var(--muted2);font-size:12px;text-decoration:none;">Forgot Password?</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PASSWORD CHANGE MODAL ════════════════════════════ -->
+<div class="modal" id="changePasswordModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="hideChangePassword()">✕</button>
+    <div class="modal-title">🔑 Change Password</div>
+    <div class="modal-sub">Enter recovery key to change password</div>
+    <div class="fg"><label class="fl">Recovery Key</label><input class="fi" id="recoveryKeyInput" type="password" placeholder="Enter recovery key"/></div>
+    <div class="fg"><label class="fl">New Password</label><input class="fi" id="newPasswordInput" type="password" placeholder="New password (min 6 chars)"/></div>
+    <button class="btn btn-g btn-full" onclick="changePassword()"><i class="fas fa-save"></i> Update Password</button>
+    <div class="alert" id="changePassAlert"></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══════════════════════════════════════ -->
+<div id="adminPage">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sbh">
+      <div class="sblogo">
+        <div class="sbic"><i class="fab fa-whatsapp"></i></div>
+        <div><div class="sbn">ISHAQ-MD</div><div class="sbv"><span class="ldot"></span>Live</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="ns">Overview</div>
+      <div class="ni active" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i>Dashboard</div>
+      <div class="ni" onclick="showPage('sessions')"><i class="fas fa-users"></i>Sessions<span class="nbadge" id="sessBadge">0</span></div>
+      <div class="ni" onclick="showPage('terminal')"><i class="fas fa-terminal"></i>Live Terminal</div>
+      <div class="ns">Messaging</div>
+      <div class="ni" onclick="showPage('broadcast')"><i class="fas fa-bullhorn"></i>Broadcast</div>
+      <div class="ni" onclick="showPage('bulkbomber')"><i class="fas fa-bolt"></i>Bulk Bomber</div>
+      <div class="ns">WhatsApp</div>
+      <div class="ni" onclick="showPage('channel')"><i class="fas fa-satellite-dish"></i>Channel Control</div>
+      <div class="ni" onclick="showPage('groups')"><i class="fas fa-user-group"></i>Group Control</div>
+      <div class="ni" onclick="showPage('reactions')"><i class="fas fa-heart"></i>Reactions</div>
+      <div class="ni" onclick="showPage('status')"><i class="fas fa-circle-dot"></i>Status Upload</div>
+      <div class="ns">Profile & Privacy</div>
+      <div class="ni" onclick="showPage('profile')"><i class="fas fa-user-edit"></i>Profile Manager</div>
+      <div class="ni" onclick="showPage('stealth')"><i class="fas fa-user-secret"></i>Stealth Mode</div>
+      <div class="ni" onclick="showPage('ghost')"><i class="fas fa-ghost"></i>Ghost Mode</div>
+      <div class="ni" onclick="showPage('simulate')"><i class="fas fa-keyboard"></i>Simulate</div>
+      <div class="ns">Automation</div>
+      <div class="ni" onclick="showPage('autoreact')"><i class="fas fa-heart-pulse"></i>Auto-React</div>
+      <div class="ni" onclick="showPage('viewonce')"><i class="fas fa-eye"></i>View-Once Gallery<span class="nbadge" id="voBadge">0</span></div>
+      <div class="ns">Data & Tools</div>
+      <div class="ni" onclick="showPage('media')"><i class="fas fa-photo-film"></i>Media Scraper</div>
+      <div class="ni" onclick="showPage('block')"><i class="fas fa-ban"></i>Block Manager</div>
+      <div class="ni" onclick="showPage('keywords')"><i class="fas fa-bell"></i>Keyword Alerts</div>
+      <div class="ni" onclick="showPage('backup')"><i class="fas fa-database"></i>Chat Backup</div>
+      <div class="ni" onclick="showPage('contacts')"><i class="fas fa-address-book"></i>Contacts Export</div>
+    </div>
+    <div class="sbf">
+      <div class="sbacts">
+        <button class="sbab" onclick="toggleTheme()"><i id="themeIcon" class="fas fa-moon"></i><span>Theme</span></button>
+        <button class="sbab" onclick="refreshAll()"><i class="fas fa-sync-alt" id="rfIcon"></i><span>Sync</span></button>
+      </div>
+      <div class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Logout</div>
+    </div>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-icon hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-icon" onclick="refreshAll()" title="Refresh"><i class="fas fa-sync-alt"></i></div>
+    <div class="topbar-icon" onclick="toggleTheme()" title="Theme"><i id="themeIcon2" class="fas fa-moon"></i></div>
+  </div>
+  <div id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ═══ DASHBOARD ════════════════════════════════════ -->
+    <div id="page-dashboard" class="page active">
+      <div class="phdr"><div><div class="section-title">📊 Dashboard</div><div class="section-sub">ISHAQ-MD Bot Panel — Real-time overview</div></div></div>
+      <div class="sgrid">
+        <div class="stat"><div class="sti g"><i class="fas fa-users"></i></div><div class="stv" id="statSessions">0</div><div class="stl">Sessions</div></div>
+        <div class="stat"><div class="sti b"><i class="fas fa-plug"></i></div><div class="stv" id="statPooled">0</div><div class="stl">Pooled</div></div>
+        <div class="stat"><div class="sti c"><i class="fas fa-paper-plane"></i></div><div class="stv" id="statMsgs">0</div><div class="stl">Messages</div></div>
+        <div class="stat"><div class="sti r"><i class="fas fa-heart"></i></div><div class="stv" id="statReactions">0</div><div class="stl">Reactions</div></div>
+        <div class="stat"><div class="sti p"><i class="fas fa-satellite-dish"></i></div><div class="stv" id="statChannels">0</div><div class="stl">Chan Actions</div></div>
+        <div class="stat"><div class="sti y"><i class="fas fa-clock"></i></div><div class="stv" id="statUptime">0s</div><div class="stl">Uptime</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-history" style="color:var(--g)"></i>Recent Activity</div>
+        <div id="activityFeed"><div style="color:var(--muted2);text-align:center;padding:24px;font-size:13px;">No activity yet.</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ SESSIONS ══════════════════════════════════════ -->
+    <div id="page-sessions" class="page">
+      <div class="phdr"><div><div class="section-title">👥 Sessions</div><div class="section-sub">All paired WhatsApp numbers</div></div><button class="btn btn-g btn-sm" onclick="loadSessions()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+      <div class="card">
+        <div class="tw"><table><thead><tr><th>Number</th><th>Name</th><th>Status</th><th>Pool</th><th>Paired</th><th>Actions</th></tr></thead>
+        <tbody id="sessionsBody"><tr><td colspan="6" style="text-align:center;color:var(--muted2);padding:30px">Loading...</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ═══ TERMINAL PAGE ════════════════════════════════ -->
+    <div id="page-terminal" class="page">
+      <div class="phdr">
+        <div><div class="section-title">💻 Live Terminal</div><div class="section-sub">Real-time message stream from all sessions</div></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="term-conn" id="termConnStatus">Connecting...</span>
+          <button class="btn btn-ghost btn-sm" onclick="clearTerminal()"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="background:var(--term-bg);min-height:400px;max-height:600px;overflow-y:auto;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;" id="mainTerminal">
+          <div class="terminal-empty">> Waiting for activity across all sessions...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BROADCAST ═════════════════════════════════════ -->
+    <div id="page-broadcast" class="page">
+      <div class="phdr"><div><div class="section-title">📢 Broadcast</div><div class="section-sub">Send messages to recipients</div></div></div>
+      <!-- Single Message -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-paper-plane" style="color:var(--g)"></i>Send Single Message</div>
+        <div class="two">
+          <div class="fg"><label class="fl">Session Number</label><input class="fi" id="singleSession" placeholder="e.g. 923001234567"/></div>
+          <div class="fg"><label class="fl">Recipient</label><input class="fi" id="singleRecipient" placeholder="923001234567"/></div>
+        </div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fi" id="singleMsg" placeholder="Your message..."></textarea></div>
+        <div class="fg"><label class="fl">Media URL (optional)</label><input class="fi" id="singleMedia" placeholder="https://..."/></div>
+        <button class="btn btn-g btn-full" onclick="sendSingle()"><i class="fas fa-paper-plane"></i> Send</button>
+        <div class="alert" id="singleAlert"></div>
+      </div>
+      <!-- Broadcast to list -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-bullhorn" style="color:var(--b)"></i>Broadcast to List</div>
+        <div class="two">
+          <div class="fg"><label class="fl">Session Number</label><input class="fi" id="broadSession" placeholder="e.g. 923001234567"/></div>
+          <div class="fg"><label class="fl">Delay (ms)</label><input class="fi" id="broadDelay" type="number" value="2000" min="500"/></div>
+        </div>
+        <div class="fg"><label class="fl">Recipients (one per line)</label><textarea class="fi" id="broadRecipients" placeholder="923001234567&#10;923009876543" style="min-height:100px;"></textarea></div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fi" id="broadMsg" placeholder="Message..."></textarea></div>
+        <div class="fg"><label class="fl">Media URL (optional)</label><input class="fi" id="broadMedia" placeholder="https://..."/></div>
+        <button class="btn btn-b btn-full" onclick="sendBroadcast()"><i class="fas fa-bullhorn"></i> Start Broadcast</button>
+        <div class="alert" id="broadAlert"></div>
+      </div>
+      <!-- Bulk to all groups -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-layer-group" style="color:var(--o)"></i>Send to ALL Groups</div>
+        <div class="two">
+          <div class="fg"><label class="fl">Session Number</label><input class="fi" id="bulkSession" placeholder="e.g. 923001234567"/></div>
+          <div class="fg"><label class="fl">Media URL (optional)</label><input class="fi" id="bulkMedia" placeholder="https://..."/></div>
+        </div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fi" id="bulkMsg" placeholder="This message goes to ALL groups..."></textarea></div>
+        <button class="btn btn-o btn-full" onclick="bulkBroadcastAll()"><i class="fas fa-layer-group"></i> Broadcast to All Groups</button>
+        <div class="alert" id="bulkAlert"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BULK BOMBER ═══════════════════════════════════ -->
+    <div id="page-bulkbomber" class="page">
+      <div class="phdr"><div><div class="section-title">⚡ Bulk Bomber</div><div class="section-sub">Send from multiple sessions to multiple numbers simultaneously</div></div></div>
+      <div class="card">
+        <div class="fg"><label class="fl">Session Numbers (comma-separated)</label><input class="fi" id="bomberSessions" placeholder="923001234567, 923009876543, ..."/></div>
+        <div class="fg"><label class="fl">Recipients (one per line)</label><textarea class="fi" id="bomberRecipients" placeholder="923001234567&#10;923009876543" style="min-height:110px;"></textarea></div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fi" id="bomberMsg" placeholder="Message to send..."></textarea></div>
+        <div class="two">
+          <div class="fg"><label class="fl">Media URL (optional)</label><input class="fi" id="bomberMedia" placeholder="https://..."/></div>
+          <div class="fg"><label class="fl">Delay per message (ms)</label><input class="fi" id="bomberDelay" type="number" value="2000" min="500"/></div>
+        </div>
+        <button class="btn btn-r btn-full" onclick="runBulkBomber()"><i class="fas fa-bolt"></i> Launch Bulk Bomber</button>
+        <div class="alert" id="bomberAlert"></div>
+        <div class="result-box" id="bomberResult"></div>
+      </div>
+    </div>
+
+    <!-- ═══ CHANNEL ════════════════════════════════════════ -->
+    <div id="page-channel" class="page">
+      <div class="phdr"><div><div class="section-title">📡 Channel Control</div><div class="section-sub">Follow, join, react to WhatsApp Channels</div></div></div>
+      <!-- Follow/Unfollow -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-satellite-dish" style="color:var(--g)"></i>Channel Action</div>
+        <div class="two">
+          <div class="fg"><label class="fl">Channel Link or JID</label><input class="fi" id="chanLink" placeholder="https://whatsapp.com/channel/... or @newsletter"/></div>
+          <div class="fg"><label class="fl">Action</label><select class="fi" id="chanAction"><option value="follow">✅ Follow</option><option value="unfollow">❌ Unfollow</option><option value="mute">🔇 Mute</option><option value="unmute">🔔 Unmute</option></select></div>
+        </div>
+        <div class="fg"><label class="fl">Sessions (comma-separated numbers)</label><input class="fi" id="chanSessions" placeholder="923001234567, 923009876543"/></div>
+        <button class="btn btn-g btn-full" onclick="channelAction()"><i class="fas fa-satellite-dish"></i> Execute</button>
+        <div class="alert" id="chanAlert"></div>
+        <div class="result-box" id="chanResult"></div>
+      </div>
+      <!-- Join via link -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-link" style="color:var(--b)"></i>Join Channel via Link</div>
+        <div class="fg"><label class="fl">Channel Link</label><input class="fi" id="joinChanLink" placeholder="https://whatsapp.com/channel/..."/></div>
+        <div class="fg"><label class="fl">Sessions (comma-separated)</label><input class="fi" id="joinChanSessions" placeholder="923001234567, 923009876543"/></div>
+        <button class="btn btn-b btn-full" onclick="channelJoin()"><i class="fas fa-sign-in-alt"></i> Join Channel</button>
+        <div class="alert" id="joinChanAlert"></div>
+      </div>
+      <!-- React to latest post -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-heart" style="color:var(--r)"></i>React to Latest Post (Auto)</div>
+        <div class="fg"><label class="fl">Channel Link or JID</label><input class="fi" id="chanReactLink" placeholder="https://whatsapp.com/channel/... or @newsletter"/></div>
+        <div class="fg"><label class="fl">Reaction Emoji</label>
+          <div class="emoji-grid" id="chanEmojiGrid"></div>
+          <input class="fi" id="chanReactEmoji" value="❤️" placeholder="Emoji..."/>
+        </div>
+        <div class="fg"><label class="fl">Sessions (comma-separated)</label><input class="fi" id="chanReactSessions" placeholder="923001234567"/></div>
+        <button class="btn btn-r btn-full" onclick="channelReact()"><i class="fas fa-heart"></i> React to Latest Post</button>
+        <div class="alert" id="chanReactAlert"></div>
+      </div>
+    </div>
+
+    <!-- ═══ GROUPS ════════════════════════════════════════ -->
+    <div id="page-groups" class="page">
+      <div class="phdr"><div><div class="section-title">👥 Group Control</div><div class="section-sub">Join, leave, list groups</div></div></div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-user-group" style="color:var(--g)"></i>Group Action</div>
+        <div class="two">
+          <div class="fg"><label class="fl">Action</label><select class="fi" id="grpAction"><option value="join">Join via Link</option><option value="leave">Leave Group</option></select></div>
+          <div class="fg"><label class="fl">Sessions (comma-separated)</label><input class="fi" id="grpSessions" placeholder="923001234567"/></div>
+        </div>
+        <div class="fg"><label class="fl">Group Link (for join)</label><input class="fi" id="grpLink" placeholder="https://chat.whatsapp.com/XXXXX"/></div>
+        <div class="fg"><label class="fl">Group JID (for leave)</label><input class="fi" id="grpJid" placeholder="120363...@g.us"/></div>
+        <button class="btn btn-g btn-full" onclick="groupAction()"><i class="fas fa-users-cog"></i> Execute</button>
+        <div class="alert" id="grpAlert"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-list" style="color:var(--b)"></i>List Groups</div>
+        <div class="fg"><label class="fl">Session Number</label><input class="fi" id="listGrpSession" placeholder="923001234567" oninput="if(this.value.length>8)listGroups()"/></div>
+        <div class="tw"><table><thead><tr><th>Group Name</th><th>Members</th><th>Role</th></tr></thead>
+        <tbody id="groupsList"><tr><td colspan="3" style="text-align:center;color:var(--muted2);padding:20px">Enter session to load</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ═══ REACTIONS ════════════════════════════════════ -->
+    <div id="page-reactions" class="page">
+      <div class="phdr"><div><div class="section-title">❤️ Reactions</div><div class="section-sub">React to posts and messages</div></div></div>
+      <div class="card">
+        <div class="fg"><label class="fl">Select Reaction</label>
+          <div class="emoji-grid" id="reactEmojiGrid"></div>
+          <input class="fi" id="reactEmoji" value="❤️" placeholder="Or type emoji..."/>
+        </div>
+        <div class="two">
+          <div class="fg"><label class="fl">Channel JID</label><input class="fi" id="reactJid" placeholder="120363...@newsletter"/></div>
+          <div class="fg"><label class="fl">Message ID</label><input class="fi" id="reactMsgId" placeholder="Numeric message ID"/></div>
+        </div>
+        <div class="fg"><label class="fl">Sessions (comma-separated)</label><input class="fi" id="reactSessions" placeholder="923001234567"/></div>
+        <button class="btn btn-r btn-full" onclick="sendReaction()"><i class="fas fa-heart"></i> Send Reaction</button>
+        <div class="alert" id="reactAlert"></div>
+        <div class="result-box" id="reactResult"></div>
+      </div>
+    </div>
+
+    <!-- ═══ STATUS ════════════════════════════════════════ -->
+    <div id="page-status" class="page">
+      <div class="phdr"><div><div class="section-title">📸 Status Upload</div><div class="section-sub">Post text or image stories</div></div></div>
+      <div class="two">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-font" style="color:var(--g)"></i>Text Status</div>
+          <div class="fg"><label class="fl">Session Number</label><input class="fi" id="statusSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Status Text</label><textarea class="fi" id="statusText" placeholder="What's on your mind?"></textarea></div>
+          <div class="fg"><label class="fl">Background Color</label><input class="fi" id="statusBg" type="color" value="#000000" style="height:44px;cursor:pointer;padding:4px 12px;"/></div>
+          <button class="btn btn-g btn-full" onclick="postTextStatus()"><i class="fas fa-circle-dot"></i> Post Text Status</button>
+          <div class="alert" id="statusTextAlert"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-image" style="color:var(--b)"></i>Image Status</div>
+          <div class="fg"><label class="fl">Session Number</label><input class="fi" id="statusImgSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Image URL</label><input class="fi" id="statusImgUrl" placeholder="https://example.com/image.jpg"/></div>
+          <div class="fg"><label class="fl">Caption (optional)</label><input class="fi" id="statusCaption" placeholder="Caption text..."/></div>
+          <button class="btn btn-b btn-full" onclick="postImageStatus()"><i class="fas fa-image"></i> Post Image Status</button>
+          <div class="alert" id="statusImgAlert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROFILE ════════════════════════════════════════ -->
+    <div id="page-profile" class="page">
+      <div class="phdr"><div><div class="section-title">👤 Profile Manager</div><div class="section-sub">Update DP, bio, name, auto-bio</div></div></div>
+      <div class="two">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-camera" style="color:var(--g)"></i>Change Profile Picture</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="dpSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Image URL</label><input class="fi" id="dpUrl" placeholder="https://example.com/photo.jpg"/></div>
+          <button class="btn btn-g btn-full" onclick="changeDp()"><i class="fas fa-upload"></i> Update DP</button>
+          <div class="alert" id="dpAlert"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-pen" style="color:var(--b)"></i>Update Bio / About</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="bioSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Bio Text</label><textarea class="fi" id="bioText" placeholder="Enter bio..." style="min-height:70px;"></textarea></div>
+          <button class="btn btn-b btn-full" onclick="changeBio()"><i class="fas fa-save"></i> Update Bio</button>
+          <div class="alert" id="bioAlert"></div>
+        </div>
+      </div>
+      <!-- Auto-Bio -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-robot" style="color:var(--p)"></i>Auto-Bio Updater (Sync with Live Stats)</div>
+        <div class="two">
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="autoBioSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Template</label><input class="fi" id="autoBioTemplate" placeholder="🤖 ISHAQ-MD | {sessions} sessions | {messages} msgs | {time}"/></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted2);margin-bottom:12px;padding:10px;background:var(--glass);border-radius:10px;border:1px solid var(--border);">
+          <b>Available tokens:</b> {sessions} {messages} {reactions} {uptime} {time}
+        </div>
+        <button class="btn btn-p btn-full" onclick="setAutoBio()"><i class="fas fa-sync-alt"></i> Sync Bio with Stats Now</button>
+        <div class="alert" id="autoBioAlert"></div>
+      </div>
+      <!-- Privacy -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-shield-alt" style="color:var(--y)"></i>Privacy Settings</div>
+        <div class="fg"><label class="fl">Session</label><input class="fi" id="privSession" placeholder="923001234567"/></div>
+        <div class="three">
+          <div class="fg"><label class="fl">Last Seen</label><select class="fi" id="privLastSeen"><option value="">No change</option><option value="all">Everyone</option><option value="contacts">Contacts</option><option value="none">Nobody</option></select></div>
+          <div class="fg"><label class="fl">Profile Photo</label><select class="fi" id="privPhoto"><option value="">No change</option><option value="all">Everyone</option><option value="contacts">Contacts</option><option value="none">Nobody</option></select></div>
+          <div class="fg"><label class="fl">Read Receipts</label><select class="fi" id="privReceipts"><option value="">No change</option><option value="on">On (Blue ticks)</option><option value="off">Off (Hidden)</option></select></div>
+        </div>
+        <button class="btn btn-y btn-full" onclick="applyPrivacy()"><i class="fas fa-save"></i> Apply Privacy</button>
+        <div class="alert" id="privAlert"></div>
+      </div>
+    </div>
+
+    <!-- ═══ STEALTH MODE ══════════════════════════════════ -->
+    <div id="page-stealth" class="page">
+      <div class="phdr"><div><div class="section-title">🕵️ Privacy Stealth Mode</div><div class="section-sub">Disable blue ticks and typing status across ALL or selected sessions with one click</div></div></div>
+      <div class="card">
+        <div style="padding:14px;background:var(--rd);border:1px solid rgba(245,83,106,.2);border-radius:12px;margin-bottom:18px;font-size:13px;color:var(--r);">
+          <i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i>
+          <b>Stealth Mode</b> hides blue ticks (read receipts), last seen, and sets presence to unavailable across all selected sessions.
+        </div>
+        <div class="fg"><label class="fl">Sessions (comma-separated, leave empty for ALL sessions)</label>
+          <input class="fi" id="stealthSessions" placeholder="Leave empty to apply to ALL sessions, or: 923001234567, 923009876543"/>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-r btn-full" onclick="setStealth(true)"><i class="fas fa-user-secret"></i> Enable Stealth (Hide everything)</button>
+          <button class="btn btn-g btn-full" onclick="setStealth(false)"><i class="fas fa-eye"></i> Disable Stealth (Restore normal)</button>
+        </div>
+        <div class="alert" id="stealthAlert"></div>
+        <div class="result-box" id="stealthResult"></div>
+      </div>
+    </div>
+
+    <!-- ═══ GHOST MODE ════════════════════════════════════ -->
+    <div id="page-ghost" class="page">
+      <div class="phdr"><div><div class="section-title">👻 Ghost Mode</div><div class="section-sub">Per-session ghost / always-online toggle</div></div></div>
+      <div class="two">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-ghost" style="color:var(--muted2)"></i>Ghost Mode</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="ghostSession" placeholder="923001234567"/></div>
+          <div class="btn-row">
+            <button class="btn btn-r btn-full" onclick="ghostMode(true)"><i class="fas fa-ghost"></i> Enable Ghost</button>
+            <button class="btn btn-g btn-full" onclick="ghostMode(false)"><i class="fas fa-eye"></i> Disable Ghost</button>
+          </div>
+          <div class="alert" id="ghostAlert"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-wifi" style="color:var(--g)"></i>Always Online</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="onlineSession" placeholder="923001234567"/></div>
+          <div class="btn-row">
+            <button class="btn btn-g btn-full" onclick="alwaysOnline(true)"><i class="fas fa-circle" style="color:#0f0;font-size:10px;"></i> Set Online</button>
+            <button class="btn btn-ghost btn-full" onclick="alwaysOnline(false)"><i class="fas fa-circle" style="color:#888;font-size:10px;"></i> Set Offline</button>
+          </div>
+          <div class="alert" id="onlineAlert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SIMULATE ══════════════════════════════════════ -->
+    <div id="page-simulate" class="page">
+      <div class="phdr"><div><div class="section-title">⌨️ Simulate Actions</div><div class="section-sub">Simulate typing or recording status</div></div></div>
+      <div class="card">
+        <div class="three">
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="simSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Target JID</label><input class="fi" id="simTarget" placeholder="923001234567@s.whatsapp.net"/></div>
+          <div class="fg"><label class="fl">Duration (ms)</label><input class="fi" id="simDuration" type="number" value="5000" min="1000"/></div>
+        </div>
+        <div class="fg"><label class="fl">Action</label><select class="fi" id="simAction"><option value="typing">⌨️ Typing...</option><option value="recording">🎙️ Recording...</option></select></div>
+        <button class="btn btn-p btn-full" onclick="simulate()"><i class="fas fa-play"></i> Start Simulation</button>
+        <div class="alert" id="simAlert"></div>
+      </div>
+    </div>
+
+    <!-- ═══ AUTO-REACT ════════════════════════════════════ -->
+    <div id="page-autoreact" class="page">
+      <div class="phdr"><div><div class="section-title">💗 Auto-React</div><div class="section-sub">Automatically react to all incoming messages</div></div></div>
+      <div class="card">
+        <div class="two">
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="arSession" placeholder="923001234567" oninput="if(this.value.length>8)loadArConfig()"/></div>
+          <div class="fg"><label class="fl">Selected Emojis</label><div id="arSelectedEmojis" style="font-size:13px;color:var(--muted2);padding:12px 0;">None selected</div></div>
+        </div>
+        <div class="fg"><label class="fl">Pick Emojis (multi-select)</label><div class="emoji-grid" id="arEmojiGrid"></div></div>
+        <div class="btn-row">
+          <button class="btn btn-g" onclick="setAutoReact(true)"><i class="fas fa-toggle-on"></i> Enable Auto-React</button>
+          <button class="btn btn-r" onclick="setAutoReact(false)"><i class="fas fa-toggle-off"></i> Disable</button>
+        </div>
+        <div class="alert" id="arAlert"></div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW-ONCE GALLERY ════════════════════════════ -->
+    <div id="page-viewonce" class="page">
+      <div class="phdr">
+        <div><div class="section-title">👁️ View-Once Gallery</div><div class="section-sub">Auto-saved view-once images and videos</div></div>
+        <button class="btn btn-g btn-sm" onclick="loadViewOnce()"><i class="fas fa-sync-alt"></i> Refresh</button>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--muted2);line-height:1.6;">
+          <i class="fas fa-info-circle" style="color:var(--b);margin-right:8px;"></i>
+          View-once media is <b style="color:var(--g)">automatically saved</b> when received by any connected session. Files are stored in <code style="color:var(--y);background:rgba(245,185,66,.1);padding:2px 6px;border-radius:5px;">data/view_once/</code>.
+        </div>
+      </div>
+      <div id="voGallery"><div style="text-align:center;color:var(--muted2);padding:40px;font-size:13px;"><i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block;"></i>Loading...</div></div>
+    </div>
+
+    <!-- ═══ MEDIA SCRAPER ════════════════════════════════ -->
+    <div id="page-media" class="page">
+      <div class="phdr"><div><div class="section-title">📽️ Media Scraper</div><div class="section-sub">Download all media from a chat</div></div></div>
+      <div class="card">
+        <div class="three">
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="mediaSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Target JID</label><input class="fi" id="mediaTarget" placeholder="@s.whatsapp.net or @g.us"/></div>
+          <div class="fg"><label class="fl">Limit</label><input class="fi" id="mediaLimit" type="number" value="50" min="5" max="200"/></div>
+        </div>
+        <button class="btn btn-p btn-full" onclick="scrapeMedia()"><i class="fas fa-download"></i> Scrape Media</button>
+        <div class="alert" id="mediaAlert"></div>
+        <div class="result-box" id="mediaResult"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BLOCK MANAGER ════════════════════════════════ -->
+    <div id="page-block" class="page">
+      <div class="phdr"><div><div class="section-title">🚫 Block Manager</div><div class="section-sub">Block, unblock, and view blocklist</div></div></div>
+      <div class="two">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-ban" style="color:var(--r)"></i>Block / Unblock</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="blockSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Target Number/JID</label><input class="fi" id="blockTarget" placeholder="923001234567"/></div>
+          <div class="btn-row">
+            <button class="btn btn-r btn-full" onclick="blockAction('block')"><i class="fas fa-ban"></i> Block</button>
+            <button class="btn btn-g btn-full" onclick="blockAction('unblock')"><i class="fas fa-check-circle"></i> Unblock</button>
+          </div>
+          <div class="alert" id="blockAlert"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-list-ul" style="color:var(--b)"></i>View Blocklist</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="blocklistSession" placeholder="923001234567" oninput="if(this.value.length>8)loadBlocklist()"/></div>
+          <div id="blocklistResult" style="font-size:12.5px;color:var(--muted2);">Enter session number above</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ KEYWORD ALERTS ════════════════════════════════ -->
+    <div id="page-keywords" class="page">
+      <div class="phdr"><div><div class="section-title">🔔 Keyword Alerts</div><div class="section-sub">Get terminal alerts when keywords appear in messages</div></div></div>
+      <div class="card">
+        <div style="font-size:13px;color:var(--muted2);margin-bottom:14px;line-height:1.5;">When any message contains a keyword, it flashes as an <span style="color:var(--r);font-weight:600;">⚠️ ALERT</span> in the Live Terminal.</div>
+        <div class="fg"><label class="fl">Session</label><input class="fi" id="kwSession" placeholder="923001234567"/></div>
+        <div class="fg"><label class="fl">Keywords (one per line)</label><textarea class="fi" id="kwList" placeholder="urgent&#10;payment&#10;order&#10;hack" style="min-height:130px;"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-g" onclick="saveKeywords()"><i class="fas fa-save"></i> Save Keywords</button>
+          <button class="btn btn-ghost" onclick="loadKeywords()"><i class="fas fa-download"></i> Load Current</button>
+        </div>
+        <div class="alert" id="kwAlert"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BACKUP ═════════════════════════════════════════ -->
+    <div id="page-backup" class="page">
+      <div class="phdr"><div><div class="section-title">💾 Chat Backup</div><div class="section-sub">Export chats and sessions as JSON or TXT</div></div></div>
+      <div class="two">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-comments" style="color:var(--g)"></i>Download Specific Chat</div>
+          <div class="fg"><label class="fl">Session</label><input class="fi" id="dlSession" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Target JID (optional)</label><input class="fi" id="dlJid" placeholder="@g.us or @s.whatsapp.net"/></div>
+          <div class="fg"><label class="fl">Chat Name</label><input class="fi" id="dlName" placeholder="Label for this backup"/></div>
+          <div class="fg"><label class="fl">Format</label><select class="fi" id="dlFormat"><option value="json">JSON</option><option value="txt">TXT</option></select></div>
+          <button class="btn btn-g btn-full" onclick="downloadChat()"><i class="fas fa-download"></i> Download</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-database" style="color:var(--b)"></i>Export Full Session</div>
+          <div class="fg"><label class="fl">Session Number</label><input class="fi" id="sessExportNum" placeholder="923001234567"/></div>
+          <div class="fg"><label class="fl">Format</label><select class="fi" id="sessExportFmt"><option value="json">JSON</option><option value="txt">TXT</option></select></div>
+          <button class="btn btn-b btn-full" onclick="exportSession()"><i class="fas fa-file-export"></i> Export Session</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-list" style="color:var(--p)"></i>Browse Chats</div>
+        <div class="fg"><label class="fl">Session</label><input class="fi" id="backupSession" placeholder="923001234567" oninput="if(this.value.length>8)listChats()"/></div>
+        <div class="tw"><table><thead><tr><th>Chat Name</th><th>Type</th><th>Members</th><th>Download</th></tr></thead>
+        <tbody id="chatsList"><tr><td colspan="4" style="text-align:center;color:var(--muted2);padding:20px">Enter session above</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ═══ CONTACTS ══════════════════════════════════════ -->
+    <div id="page-contacts" class="page">
+      <div class="phdr"><div><div class="section-title">📒 Contacts Export</div><div class="section-sub">Preview and export contacts from a session</div></div></div>
+      <div class="card">
+        <div class="fg"><label class="fl">Session Number</label><input class="fi" id="contactSession" placeholder="923001234567"/></div>
+        <div class="btn-row">
+          <button class="btn btn-b" onclick="previewContacts()"><i class="fas fa-eye"></i> Preview</button>
+          <button class="btn btn-g" onclick="exportContacts('json')"><i class="fas fa-download"></i> JSON</button>
+          <button class="btn btn-ghost" onclick="exportContacts('txt')"><i class="fas fa-file-alt"></i> TXT</button>
+        </div>
+        <div class="alert" id="contactAlert"></div>
+        <div id="contactPreview" style="margin-top:14px;max-height:400px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- ══ LIVE TERMINAL BAR ══════════════════════════════════ -->
+  <div id="terminalBar">
+    <div class="term-hdr" onclick="toggleTerminal()">
+      <div class="term-dots"><div class="tdot r"></div><div class="tdot y"></div><div class="tdot g"></div></div>
+      <div class="term-label">⚡ ISHAQ-MD Live Terminal — All Sessions</div>
+      <span class="term-conn disconnected" id="termBarStatus">Connecting...</span>
+      <div class="term-btns" onclick="event.stopPropagation()">
+        <button class="tbtn" onclick="clearTerminal()" title="Clear"><i class="fas fa-trash"></i></button>
+        <button class="tbtn" id="termToggleBtn" title="Collapse"><i class="fas fa-chevron-down"></i></button>
+      </div>
+    </div>
+    <div class="term-body" id="miniTerminal">
+      <div class="terminal-empty">> Waiting for incoming messages...</div>
+    </div>
+  </div>
+
+</div><!-- /adminPage -->
+
+<script>
+// ════════════════════════════════════════════════════════════
+// ISHAQ-MD Admin Panel v6.1
+// ════════════════════════════════════════════════════════════
+const CREDS = { username: 'ishaqmd', password: 'aass1122@' };
+let AUTH_TOKEN = '';
+let _sessions = [];
+let selectedArEmojis = [];
+const MAX_TERM_LINES = 50;
+const EMOJIS = ['❤️','😂','😮','😢','🙏','👍','🔥','💯','🥰','👏','🎉','😍','🤩','😭','💪','🌹','✨','😊'];
+
+// ── Theme ─────────────────────────────────────────────────
+let isDark = localStorage.getItem('ishaq_theme') !== 'light';
+function applyTheme() {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    const ic = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    document.getElementById('themeIcon').className = ic;
+    document.getElementById('themeIcon2').className = ic;
+}
+function toggleTheme() { isDark = !isDark; localStorage.setItem('ishaq_theme', isDark ? 'dark' : 'light'); applyTheme(); }
+applyTheme();
+
+// ── Login ─────────────────────────────────────────────────
+async function doLogin() {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value.trim();
+    if (!u || !p) return;
+    try {
+        const data = await fetch('/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+        }).then(r => r.json());
+        if (data.success) {
+            AUTH_TOKEN = data.token;
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'block';
+            initSocket();
+            buildEmojiGrids();
+            refreshAll();
+        } else {
+            const err = document.getElementById('loginErr');
+            err.style.display = 'block';
+            err.textContent = data.error || 'Invalid credentials';
+            setTimeout(() => err.style.display = 'none', 3000);
+        }
+    } catch(e) {
+        document.getElementById('loginErr').style.display = 'block';
+        document.getElementById('loginErr').textContent = 'Connection error';
+    }
+}
+document.addEventListener('keypress', e => {
+    if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
+});
+function logout() { AUTH_TOKEN = ''; location.reload(); }
+
+// ── Password Change ──────────────────────────────────────
+function showChangePassword() {
+    document.getElementById('changePasswordModal').classList.add('show');
+}
+function hideChangePassword() {
+    document.getElementById('changePasswordModal').classList.remove('show');
+}
+async function changePassword() {
+    const recoveryKey = document.getElementById('recoveryKeyInput').value.trim();
+    const newPassword = document.getElementById('newPasswordInput').value.trim();
+    if (!recoveryKey || !newPassword) {
+        return showAlert('changePassAlert', 'Recovery key and new password required.', 'error');
+    }
+    if (newPassword.length < 6) {
+        return showAlert('changePassAlert', 'Password must be at least 6 characters.', 'error');
+    }
+    try {
+        const data = await fetch('/admin/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recoveryKey, newPassword })
+        }).then(r => r.json());
+        if (data.success) {
+            showAlert('changePassAlert', '✅ Password changed successfully!', 'success');
+            setTimeout(() => {
+                hideChangePassword();
+                document.getElementById('recoveryKeyInput').value = '';
+                document.getElementById('newPasswordInput').value = '';
+            }, 2000);
+        } else {
+            showAlert('changePassAlert', data.error || 'Failed to change password.', 'error');
+        }
+    } catch(e) {
+        showAlert('changePassAlert', 'Connection error.', 'error');
+    }
+}
+
+// ── Navigation ────────────────────────────────────────────
+const pageTitles = {
+    dashboard:'Dashboard',sessions:'Sessions',terminal:'Live Terminal',
+    broadcast:'Broadcast',bulkbomber:'Bulk Bomber',channel:'Channel Control',
+    groups:'Group Control',reactions:'Reactions',status:'Status Upload',
+    profile:'Profile Manager',stealth:'Stealth Mode',ghost:'Ghost Mode',
+    simulate:'Simulate',autoreact:'Auto-React',viewonce:'View-Once Gallery',
+    media:'Media Scraper',block:'Block Manager',keywords:'Keyword Alerts',
+    backup:'Chat Backup',contacts:'Contacts Export'
+};
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+    const pg = document.getElementById('page-' + name);
+    if (pg) pg.classList.add('active');
+    document.querySelectorAll('.ni').forEach(n => {
+        if (n.getAttribute('onclick')?.includes(`'${name}'`)) n.classList.add('active');
+    });
+    document.getElementById('topbarTitle').textContent = pageTitles[name] || name;
+    closeSidebar();
+    if (name === 'sessions') loadSessions();
+    if (name === 'dashboard') refreshStats();
+    if (name === 'viewonce') loadViewOnce();
+}
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+}
+
+// ── Toast ─────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.innerHTML = `<span>${icons[type] || ''}</span><span>${escHtml(msg)}</span>`;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(() => { t.style.animation = 'slideOut .3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3500);
+}
+function showAlert(id, msg, type = 'success') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `alert alert-${type} show`;
+    el.innerHTML = msg;
+    setTimeout(() => el.className = 'alert', 6000);
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtTime(iso) {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+function sessArr(csvId) {
+    return document.getElementById(csvId).value.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// ── API ───────────────────────────────────────────────────
+async function api(method, path, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${AUTH_TOKEN}` } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch('/admin' + path, opts);
+    return res.json();
+}
+async function apiDownload(path) {
+    return fetch('/admin' + path, { headers: { 'Authorization': `Basic ${AUTH_TOKEN}` } });
+}
+
+// ══════════════════════════════════════════════════════════
+// SOCKET.IO LIVE TERMINAL
+// ══════════════════════════════════════════════════════════
+let socket = null;
+let termCollapsed = false;
+
+function initSocket() {
+    if (socket) return;
+    try {
+        socket = io(window.location.origin, {
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionDelay: 2000,
+            reconnectionAttempts: 10,
+        });
+
+        socket.on('connect', () => {
+            console.log('[🔌] Socket.io connected:', socket.id);
+            setTermStatus(true);
+        });
+
+        socket.on('disconnect', (reason) => {
+            console.log('[🔌] Socket.io disconnected:', reason);
+            setTermStatus(false);
+        });
+
+        socket.on('connect_error', (err) => {
+            console.log('[🔌] Connect error:', err.message);
+            setTermStatus(false);
+        });
+
+        socket.on('terminal', (data) => {
+            addTerminalLine(data);
+        });
+
+        socket.on('stats-update', (data) => {
+            if (data) {
+                document.getElementById('statSessions').textContent = data.sessions || 0;
+                document.getElementById('statPooled').textContent = data.connected || 0;
+            }
+        });
+
+    } catch(e) {
+        console.error('[❌] Socket.io init failed:', e.message);
+    }
+}
+
+function setTermStatus(connected) {
+    const ids = ['termConnStatus', 'termBarStatus'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (connected) {
+            el.textContent = '● Connected';
+            el.className = el.className.replace('disconnected', 'connected');
+            if (id === 'termBarStatus') el.className = 'term-conn connected';
+        } else {
+            el.textContent = '○ Disconnected';
+            el.className = el.className.replace('connected', 'disconnected');
+            if (id === 'termBarStatus') el.className = 'term-conn disconnected';
+        }
+    });
+}
+
+function addTerminalLine(data) {
+    const time = new Date(data.time || Date.now()).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const isAlert = data.alert || data.chatType === 'ALERT';
+    const isSystem = data.system || data.chatType === 'SYSTEM';
+    const isVO = data.chatType === 'VIEW-ONCE';
+    const isOut = data.fromMe;
+    const ct = data.chatType || 'MSG';
+    let typeClass = isAlert ? 'alert' : isSystem ? 'system' : isVO ? 'view-once' : isOut ? 'out' : ct === 'Group' ? 'group' : ct === 'Channel' ? 'channel' : 'private';
+    const typeLabel = isAlert ? '⚠ ALERT' : isSystem ? 'SYS' : isVO ? '👁 VO' : isOut ? '↑OUT' : ct.toUpperCase().substring(0, 7);
+
+    const lineHtml = `<div class="terminal-line">
+        <span class="t-time">[${time}]</span>
+        <span class="t-type ${typeClass}">${typeLabel}</span>
+        <span class="t-sender">${escHtml(data.sender || '?')}</span>
+        <span class="t-content">${escHtml(String(data.content || '').substring(0, 200))}</span>
+        <span style="color:#2a5040;font-size:10.5px;flex-shrink:0;">@${escHtml(data.session || '?')}</span>
+    </div>`;
+
+    ['mainTerminal', 'miniTerminal'].forEach(id => {
+        const term = document.getElementById(id);
+        if (!term) return;
+        const empty = term.querySelector('.terminal-empty');
+        if (empty) empty.remove();
+        term.insertAdjacentHTML('beforeend', lineHtml);
+        const lines = term.querySelectorAll('.terminal-line');
+        while (lines.length > MAX_TERM_LINES) {
+            term.removeChild(term.querySelector('.terminal-line'));
+        }
+        term.scrollTop = term.scrollHeight;
+    });
+}
+
+function clearTerminal() {
+    const msg = '<div class="terminal-empty">> Terminal cleared. Waiting...</div>';
+    ['mainTerminal', 'miniTerminal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = msg;
+    });
+}
+
+function toggleTerminal() {
+    termCollapsed = !termCollapsed;
+    document.getElementById('terminalBar').classList.toggle('collapsed', termCollapsed);
+    const ic = document.querySelector('#termToggleBtn i');
+    if (ic) ic.className = termCollapsed ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+}
+
+// ── Emoji grids ───────────────────────────────────────────
+function buildEmojiGrids() {
+    buildGrid('chanEmojiGrid', EMOJIS, 'chanReactEmoji', false);
+    buildGrid('reactEmojiGrid', EMOJIS, 'reactEmoji', false);
+    buildGrid('arEmojiGrid', EMOJIS, null, true);
+}
+function buildGrid(gridId, emojis, hiddenId, multi) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
+    emojis.forEach(e => {
+        const btn = document.createElement('div');
+        btn.className = 'emoji-btn' + (e === '❤️' && !multi ? ' selected' : '');
+        btn.textContent = e;
+        btn.onclick = () => {
+            if (multi) {
+                btn.classList.toggle('selected');
+                selectedArEmojis = [...grid.querySelectorAll('.emoji-btn.selected')].map(b => b.textContent);
+                document.getElementById('arSelectedEmojis').textContent = 'Selected: ' + (selectedArEmojis.join(' ') || 'none');
+            } else {
+                grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                if (hiddenId) document.getElementById(hiddenId).value = e;
+            }
+        };
+        grid.appendChild(btn);
+    });
+    if (!multi && emojis.length) grid.children[0]?.classList.add('selected');
+}
+
+// ── Refresh ───────────────────────────────────────────────
+async function refreshAll() {
+    const ic = document.getElementById('rfIcon');
+    ic.style.animation = 'spin .7s linear infinite';
+    await Promise.all([refreshStats(), loadActivity(), loadSessions()]);
+    setTimeout(() => ic.style.animation = '', 800);
+}
+async function refreshStats() {
+    try {
+        const d = await api('GET', '/stats');
+        document.getElementById('statSessions').textContent = d.totalSessions ?? 0;
+        document.getElementById('statPooled').textContent = d.pooledConnections ?? 0;
+        document.getElementById('statMsgs').textContent = d.messages ?? 0;
+        document.getElementById('statReactions').textContent = d.reactions ?? 0;
+        document.getElementById('statChannels').textContent = d.channelActions ?? 0;
+        document.getElementById('statUptime').textContent = d.uptimeStr || '0s';
+        if (d.viewOnceCount !== undefined) {
+            document.getElementById('voBadge').textContent = d.viewOnceCount;
+        }
+    } catch(e) { console.error(e); }
+}
+async function loadActivity() {
+    try {
+        const d = await api('GET', '/activity');
+        const feed = document.getElementById('activityFeed');
+        if (!d.activity?.length) { feed.innerHTML = '<div style="color:var(--muted2);text-align:center;padding:24px;font-size:13px">No activity yet.</div>'; return; }
+        feed.innerHTML = d.activity.slice(0, 30).map(a => {
+            const color = a.status === 'success' ? 'var(--g)' : 'var(--r)';
+            return `<div class="activity-item">
+                <div class="activity-dot" style="background:${color}"></div>
+                <div class="activity-content">
+                    <div class="activity-action">${escHtml(a.action)} <span style="color:var(--muted2);font-weight:400">· ${escHtml(a.user)}</span></div>
+                    <div class="activity-detail">${escHtml(a.details)}</div>
+                </div>
+                <div class="activity-time">${fmtTime(a.time)}</div>
+            </div>`;
+        }).join('');
+    } catch(e) {}
+}
+async function loadSessions() {
+    try {
+        const d = await api('GET', '/sessions');
+        _sessions = d.sessions || [];
+        const badge = document.getElementById('sessBadge');
+        if (badge) badge.textContent = _sessions.length;
+        const tbody = document.getElementById('sessionsBody');
+        if (!tbody) return;
+        if (!_sessions.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted2);padding:30px">No sessions. Pair a device first.</td></tr>'; return; }
+        tbody.innerHTML = _sessions.map(s => {
+            const conn = s.pooled ? '<span class="badge badge-green">● Live</span>' : '<span class="badge badge-yellow">○ Idle</span>';
+            const stat = s.status === 'logged_out' ? '<span class="badge badge-red">Logged Out</span>' : '<span class="badge badge-green">Active</span>';
+            return `<tr>
+                <td><code style="color:var(--g);font-size:12px">${escHtml(s.number)}</code></td>
+                <td>${escHtml(s.pushName || '—')}</td>
+                <td>${stat}</td><td>${conn}</td>
+                <td style="font-size:12px;color:var(--muted2);">${s.connectedAt ? new Date(s.connectedAt).toLocaleDateString() : '—'}</td>
+                <td style="display:flex;gap:5px;">
+                    <button class="btn btn-ghost btn-sm" onclick="reconnectSession('${s.number}')"><i class="fas fa-plug"></i></button>
+                    <button class="btn btn-r btn-sm" onclick="deleteSession('${s.number}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch(e) { console.error(e); }
+}
+async function deleteSession(num) {
+    if (!confirm(`Delete session ${num}?`)) return;
+    const d = await api('DELETE', `/sessions/${num}`);
+    if (d.success) { toast('Session deleted', 'success'); loadSessions(); refreshStats(); }
+    else toast(d.error || 'Failed', 'error');
+}
+async function reconnectSession(num) {
+    toast(`Reconnecting ${num}...`, 'info');
+    try { await api('GET', `/groups/${num}`); toast(`Session ${num} reconnected!`, 'success'); loadSessions(); }
+    catch(e) { toast('Reconnect failed: ' + e.message, 'error'); }
+}
+
+// ── Messaging ─────────────────────────────────────────────
+async function sendSingle() {
+    const sessionNumber = document.getElementById('singleSession').value.trim();
+    const recipient = document.getElementById('singleRecipient').value.trim();
+    const message = document.getElementById('singleMsg').value.trim();
+    const mediaUrl = document.getElementById('singleMedia').value.trim();
+    if (!sessionNumber || !recipient || !message) return showAlert('singleAlert', 'Fill all required fields.', 'error');
+    const d = await api('POST', '/send-message', { sessionNumber, recipient, message, mediaUrl: mediaUrl || undefined });
+    if (d.success) { showAlert('singleAlert', '✅ Message sent!', 'success'); toast('Message sent', 'success'); }
+    else showAlert('singleAlert', d.error || 'Failed', 'error');
+}
+async function sendBroadcast() {
+    const sessionNumber = document.getElementById('broadSession').value.trim();
+    const recipientsRaw = document.getElementById('broadRecipients').value.trim();
+    const message = document.getElementById('broadMsg').value.trim();
+    const mediaUrl = document.getElementById('broadMedia').value.trim();
+    const delayMs = parseInt(document.getElementById('broadDelay').value) || 2000;
+    if (!sessionNumber || !recipientsRaw || !message) return showAlert('broadAlert', 'Fill all required fields.', 'error');
+    const recipients = recipientsRaw.split('\n').map(r => r.trim()).filter(Boolean);
+    showAlert('broadAlert', `Sending to ${recipients.length} recipients...`, 'info');
+    const d = await api('POST', '/broadcast', { sessionNumber, recipients, message, mediaUrl: mediaUrl || undefined, delayMs });
+    if (d.success) { showAlert('broadAlert', `✅ Sent: ${d.successCount} | Failed: ${d.failCount}`, 'success'); toast(`Broadcast done: ${d.successCount} sent`, 'success'); }
+    else showAlert('broadAlert', d.error || 'Failed', 'error');
+}
+async function bulkBroadcastAll() {
+    const sessionNumber = document.getElementById('bulkSession').value.trim();
+    const message = document.getElementById('bulkMsg').value.trim();
+    const mediaUrl = document.getElementById('bulkMedia').value.trim();
+    if (!sessionNumber || !message) return showAlert('bulkAlert', 'Fill all required fields.', 'error');
+    if (!confirm('This will send to ALL groups. Proceed?')) return;
+    showAlert('bulkAlert', 'Broadcasting to all groups...', 'info');
+    const d = await api('POST', '/bulk-broadcast-all', { sessionNumber, message, mediaUrl: mediaUrl || undefined });
+    if (d.success) { showAlert('bulkAlert', `✅ Sent: ${d.successCount} | Failed: ${d.failCount}`, 'success'); toast('Bulk broadcast done', 'success'); }
+    else showAlert('bulkAlert', d.error || 'Failed', 'error');
+}
+
+// ── Bulk Bomber ───────────────────────────────────────────
+async function runBulkBomber() {
+    const sessRaw = document.getElementById('bomberSessions').value.trim();
+    const sessions = sessRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const recipients = document.getElementById('bomberRecipients').value.trim();
+    const message = document.getElementById('bomberMsg').value.trim();
+    const mediaUrl = document.getElementById('bomberMedia').value.trim();
+    const delayMs = parseInt(document.getElementById('bomberDelay').value) || 2000;
+    if (!sessions.length || !recipients || !message) return showAlert('bomberAlert', 'Fill sessions, recipients and message.', 'error');
+    if (!confirm(`Send to multiple recipients from ${sessions.length} sessions?`)) return;
+    showAlert('bomberAlert', `Launching from ${sessions.length} sessions...`, 'info');
+    const d = await api('POST', '/bulk-bomber', { sessions, recipients, message, mediaUrl: mediaUrl || undefined, delayMs });
+    const box = document.getElementById('bomberResult');
+    box.className = 'result-box show';
+    if (d.success) {
+        showAlert('bomberAlert', `✅ Sent: ${d.successCount} | Failed: ${d.failCount}`, 'success');
+        box.textContent = `Sent: ${d.successCount}\nFailed: ${d.failCount}\n\n` + d.results.map(r => `[${r.session}→${r.recipient}] ${r.status}`).join('\n');
+        toast('Bulk bomber done!', 'success');
+    } else {
+        showAlert('bomberAlert', d.error || 'All failed', 'error');
+        box.textContent = JSON.stringify(d, null, 2);
+    }
+}
+
+// ── Channel ───────────────────────────────────────────────
+async function channelAction() {
+    const channelLink = document.getElementById('chanLink').value.trim();
+    const action = document.getElementById('chanAction').value;
+    const sessions = sessArr('chanSessions');
+    if (!channelLink || !sessions.length) return showAlert('chanAlert', 'Channel link and sessions required.', 'error');
+    showAlert('chanAlert', 'Processing...', 'info');
+    const d = await api('POST', '/channel-action', { channelLink, action, sessions });
+    const box = document.getElementById('chanResult');
+    box.className = 'result-box show';
+    box.textContent = JSON.stringify(d, null, 2);
+    if (d.success) { showAlert('chanAlert', `✅ ${d.successCount} ok, ${d.failCount} failed. JID: ${d.resolvedJid || '?'}`, 'success'); toast('Channel action done', 'success'); }
+    else showAlert('chanAlert', d.error || d.results?.[0]?.error || 'All failed', 'error');
+}
+async function channelJoin() {
+    const channelLink = document.getElementById('joinChanLink').value.trim();
+    const sessions = sessArr('joinChanSessions');
+    if (!channelLink || !sessions.length) return showAlert('joinChanAlert', 'Channel link and sessions required.', 'error');
+    showAlert('joinChanAlert', 'Joining...', 'info');
+    const d = await api('POST', '/channel-join', { channelLink, sessions });
+    if (d.success) { showAlert('joinChanAlert', `✅ Joined! ${d.successCount} ok. JID: ${d.resolvedJid}`, 'success'); toast('Channel joined', 'success'); }
+    else showAlert('joinChanAlert', d.results?.[0]?.error || 'Failed to join', 'error');
+}
+async function channelReact() {
+    const channelLink = document.getElementById('chanReactLink').value.trim();
+    const reaction = document.getElementById('chanReactEmoji').value;
+    const sessions = sessArr('chanReactSessions');
+    if (!channelLink || !sessions.length) return showAlert('chanReactAlert', 'Channel link and sessions required.', 'error');
+    showAlert('chanReactAlert', 'Reacting to latest post...', 'info');
+    const d = await api('POST', '/channel-react', { channelLink, reaction, sessions });
+    if (d.success) { showAlert('chanReactAlert', `✅ ${d.successCount} reactions sent!`, 'success'); toast('Reactions sent', 'success'); }
+    else showAlert('chanReactAlert', d.results?.[0]?.error || 'Failed', 'error');
+}
+
+// ── Groups ────────────────────────────────────────────────
+async function groupAction() {
+    const action = document.getElementById('grpAction').value;
+    const groupLink = document.getElementById('grpLink').value.trim();
+    const groupJid = document.getElementById('grpJid').value.trim();
+    const sessions = sessArr('grpSessions');
+    if (!sessions.length) return showAlert('grpAlert', 'Sessions required.', 'error');
+    const d = await api('POST', '/group-action', { action, groupLink: groupLink || undefined, groupJid: groupJid || undefined, sessions });
+    if (d.successCount > 0) { showAlert('grpAlert', `✅ ${d.successCount} ok, ${d.failCount} failed`, 'success'); toast('Group action done', 'success'); }
+    else showAlert('grpAlert', d.results?.[0]?.error || 'All failed', 'error');
+}
+async function listGroups() {
+    const num = document.getElementById('listGrpSession').value.trim();
+    if (!num) return;
+    const tbody = document.getElementById('groupsList');
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:12px">Loading...</td></tr>';
+    try {
+        const d = await api('GET', `/groups/${num}`);
+        if (!d.groups?.length) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted2);padding:20px">No groups found.</td></tr>'; return; }
+        tbody.innerHTML = d.groups.map(g =>
+            `<tr><td>${escHtml(g.name)}</td><td>${g.participants}</td><td>${g.isAdmin ? '<span class="badge badge-green">Admin</span>' : '<span class="badge badge-muted">Member</span>'}</td></tr>`
+        ).join('');
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+
+// ── Reactions ─────────────────────────────────────────────
+async function sendReaction() {
+    const channelJid = document.getElementById('reactJid').value.trim();
+    const messageId = document.getElementById('reactMsgId').value.trim();
+    const reaction = document.getElementById('reactEmoji').value;
+    const sessions = sessArr('reactSessions');
+    if (!messageId || !sessions.length) return showAlert('reactAlert', 'Message ID and sessions required.', 'error');
+    const d = await api('POST', '/send-reaction', { reaction, sessions, channelJid: channelJid || undefined, messageId });
+    const box = document.getElementById('reactResult');
+    box.className = 'result-box show';
+    box.textContent = JSON.stringify(d, null, 2);
+    if (d.successCount > 0) { showAlert('reactAlert', `✅ ${d.successCount} reactions sent!`, 'success'); toast('Reactions sent', 'success'); }
+    else showAlert('reactAlert', d.results?.[0]?.error || 'Failed', 'error');
+}
+
+// ── Status ────────────────────────────────────────────────
+async function postTextStatus() {
+    const sessionNumber = document.getElementById('statusSession').value.trim();
+    const text = document.getElementById('statusText').value.trim();
+    const backgroundColor = document.getElementById('statusBg').value;
+    if (!sessionNumber || !text) return showAlert('statusTextAlert', 'Session and text required.', 'error');
+    const d = await api('POST', '/status/text', { sessionNumber, text, backgroundColor });
+    if (d.success) { showAlert('statusTextAlert', '✅ Status posted!', 'success'); toast('Text status posted', 'success'); }
+    else showAlert('statusTextAlert', d.error || 'Failed', 'error');
+}
+async function postImageStatus() {
+    const sessionNumber = document.getElementById('statusImgSession').value.trim();
+    const imageUrl = document.getElementById('statusImgUrl').value.trim();
+    const caption = document.getElementById('statusCaption').value.trim();
+    if (!sessionNumber || !imageUrl) return showAlert('statusImgAlert', 'Session and image URL required.', 'error');
+    const d = await api('POST', '/status/image', { sessionNumber, imageUrl, caption });
+    if (d.success) { showAlert('statusImgAlert', '✅ Image status posted!', 'success'); toast('Image status posted', 'success'); }
+    else showAlert('statusImgAlert', d.error || 'Failed', 'error');
+}
+
+// ── Profile ───────────────────────────────────────────────
+async function changeDp() {
+    const sessionNumber = document.getElementById('dpSession').value.trim();
+    const imageUrl = document.getElementById('dpUrl').value.trim();
+    if (!sessionNumber || !imageUrl) return showAlert('dpAlert', 'Session and image URL required.', 'error');
+    const d = await api('POST', '/profile/dp', { sessionNumber, imageUrl });
+    if (d.success) { showAlert('dpAlert', '✅ DP updated!', 'success'); toast('DP updated', 'success'); }
+    else showAlert('dpAlert', d.error || 'Failed', 'error');
+}
+async function changeBio() {
+    const sessionNumber = document.getElementById('bioSession').value.trim();
+    const bio = document.getElementById('bioText').value.trim();
+    if (!sessionNumber || !bio) return showAlert('bioAlert', 'Session and bio required.', 'error');
+    const d = await api('POST', '/profile/bio', { sessionNumber, bio });
+    if (d.success) { showAlert('bioAlert', '✅ Bio updated!', 'success'); toast('Bio updated', 'success'); }
+    else showAlert('bioAlert', d.error || 'Failed', 'error');
+}
+async function setAutoBio() {
+    const sessionNumber = document.getElementById('autoBioSession').value.trim();
+    const template = document.getElementById('autoBioTemplate').value.trim();
+    if (!sessionNumber) return showAlert('autoBioAlert', 'Session required.', 'error');
+    showAlert('autoBioAlert', 'Syncing bio with stats...', 'info');
+    const d = await api('POST', '/profile/auto-bio', { sessionNumber, template: template || undefined });
+    if (d.success) { showAlert('autoBioAlert', `✅ Bio set: "${d.bio}"`, 'success'); toast('Auto-bio synced!', 'success'); }
+    else showAlert('autoBioAlert', d.error || 'Failed', 'error');
+}
+async function applyPrivacy() {
+    const sessionNumber = document.getElementById('privSession').value.trim();
+    if (!sessionNumber) return showAlert('privAlert', 'Session required.', 'error');
+    const body = { sessionNumber };
+    const ls = document.getElementById('privLastSeen').value;
+    const ph = document.getElementById('privPhoto').value;
+    const rc = document.getElementById('privReceipts').value;
+    if (ls) body.lastSeen = ls;
+    if (ph) body.profilePhoto = ph;
+    if (rc) body.readReceipts = rc === 'on';
+    const d = await api('POST', '/privacy/settings', body);
+    if (d.success) { showAlert('privAlert', '✅ Privacy updated: ' + (d.changes?.join(', ') || ''), 'success'); toast('Privacy applied', 'success'); }
+    else showAlert('privAlert', d.error || 'Failed', 'error');
+}
+
+// ── Stealth Mode ──────────────────────────────────────────
+async function setStealth(enabled) {
+    const sessRaw = document.getElementById('stealthSessions').value.trim();
+    const sessions = sessRaw ? sessRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    showAlert('stealthAlert', `${enabled ? 'Enabling' : 'Disabling'} stealth mode...`, 'info');
+    const d = await api('POST', '/stealth-mode', { enabled, sessions: sessions.length ? sessions : undefined });
+    const box = document.getElementById('stealthResult');
+    box.className = 'result-box show';
+    box.textContent = `${enabled ? 'Enabled' : 'Disabled'} on ${d.successCount} sessions\nFailed: ${d.failCount}\n` +
+        d.results.map(r => `[${r.session}] ${r.status} ${r.error ? '— ' + r.error : ''}`).join('\n');
+    if (d.success) { showAlert('stealthAlert', `✅ Stealth ${enabled ? 'ENABLED' : 'DISABLED'} on ${d.successCount} sessions`, 'success'); toast(`Stealth mode ${enabled ? 'on' : 'off'}`, 'success'); }
+    else showAlert('stealthAlert', 'Failed on all sessions', 'error');
+}
+
+// ── Ghost / Online ────────────────────────────────────────
+async function ghostMode(enabled) {
+    const sessionNumber = document.getElementById('ghostSession').value.trim();
+    if (!sessionNumber) return showAlert('ghostAlert', 'Session required.', 'error');
+    const d = await api('POST', '/ghost-mode', { sessionNumber, enabled });
+    if (d.success) { showAlert('ghostAlert', `✅ Ghost Mode ${enabled ? 'ENABLED' : 'DISABLED'}!`, 'success'); toast(`Ghost mode ${enabled ? 'on' : 'off'}`, 'success'); }
+    else showAlert('ghostAlert', d.error || 'Failed', 'error');
+}
+async function alwaysOnline(enabled) {
+    const sessionNumber = document.getElementById('onlineSession').value.trim();
+    if (!sessionNumber) return showAlert('onlineAlert', 'Session required.', 'error');
+    const d = await api('POST', '/always-online', { sessionNumber, enabled });
+    if (d.success) { showAlert('onlineAlert', `✅ Always Online ${enabled ? 'ON' : 'OFF'}!`, 'success'); toast(`Always online ${enabled ? 'on' : 'off'}`, 'success'); }
+    else showAlert('onlineAlert', d.error || 'Failed', 'error');
+}
+
+// ── Simulate ──────────────────────────────────────────────
+async function simulate() {
+    const sessionNumber = document.getElementById('simSession').value.trim();
+    const targetJid = document.getElementById('simTarget').value.trim();
+    const action = document.getElementById('simAction').value;
+    const durationMs = parseInt(document.getElementById('simDuration').value) || 5000;
+    if (!sessionNumber || !targetJid) return showAlert('simAlert', 'Session and target required.', 'error');
+    const d = await api('POST', '/simulate', { sessionNumber, targetJid, action, durationMs });
+    if (d.success) { showAlert('simAlert', `✅ Simulating "${action}" for ${durationMs}ms...`, 'success'); toast('Simulation started', 'success'); }
+    else showAlert('simAlert', d.error || 'Failed', 'error');
+}
+
+// ── Auto-React ────────────────────────────────────────────
+async function loadArConfig() {
+    const num = document.getElementById('arSession').value.trim();
+    if (!num || num.length < 8) return;
+    try {
+        const d = await api('GET', `/auto-reaction/${num}`);
+        if (d.config?.emojis) {
+            selectedArEmojis = d.config.emojis;
+            document.getElementById('arSelectedEmojis').textContent = 'Selected: ' + selectedArEmojis.join(' ');
+            document.querySelectorAll('#arEmojiGrid .emoji-btn').forEach(b => {
+                b.classList.toggle('selected', selectedArEmojis.includes(b.textContent));
+            });
+        }
+    } catch(e) {}
+}
+async function setAutoReact(enabled) {
+    const sessionNumber = document.getElementById('arSession').value.trim();
+    if (!sessionNumber) return showAlert('arAlert', 'Session required.', 'error');
+    const emojis = selectedArEmojis.length ? selectedArEmojis : ['❤️'];
+    const d = await api('POST', '/auto-reaction', { sessionNumber, enabled, emojis });
+    if (d.success) { showAlert('arAlert', `✅ Auto-React ${enabled ? 'ENABLED' : 'DISABLED'} with ${emojis.join(' ')}`, 'success'); toast(`Auto-react ${enabled ? 'on' : 'off'}`, 'success'); }
+    else showAlert('arAlert', d.error || 'Failed', 'error');
+}
+
+// ── View-Once Gallery ─────────────────────────────────────
+async function loadViewOnce() {
+    const gallery = document.getElementById('voGallery');
+    gallery.innerHTML = '<div style="text-align:center;color:var(--muted2);padding:30px;"><i class="fas fa-spinner fa-spin" style="font-size:22px;"></i></div>';
+    try {
+        const d = await api('GET', '/view-once/list');
+        const files = d.files || [];
+        const badge = document.getElementById('voBadge');
+        if (badge) badge.textContent = files.length;
+        if (!files.length) {
+            gallery.innerHTML = '<div style="text-align:center;color:var(--muted2);padding:40px;"><i class="fas fa-eye-slash" style="font-size:32px;display:block;margin-bottom:12px;opacity:.4;"></i>No view-once media saved yet.<br><small>They will appear here automatically when received.</small></div>';
+            return;
+        }
+        gallery.innerHTML = `<div class="vo-grid">${files.map(f => {
+            const isImg = f.type === 'imageMessage';
+            const isVid = f.type === 'videoMessage';
+            const icon = isImg ? '🖼️' : isVid ? '🎬' : '🎵';
+            const typeLabel = isImg ? 'Image' : isVid ? 'Video' : 'Audio';
+            const typeColor = isImg ? 'var(--g)' : isVid ? 'var(--b)' : 'var(--p)';
+            return `<div class="vo-card">
+                <div class="vo-thumb" style="background:rgba(0,0,0,.4);">
+                    ${isImg
+                        ? `<img src="/admin/view-once/file/${encodeURIComponent(f.fileName)}?auth=${AUTH_TOKEN}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='${icon}'" />`
+                        : `<div style="font-size:40px;">${icon}</div>`}
+                </div>
+                <div class="vo-info">
+                    <div class="vo-type" style="color:${typeColor}">${typeLabel}</div>
+                    <div class="vo-from">From: ${escHtml(f.from)}</div>
+                    <div class="vo-size">${f.sizeStr} · Session: ${escHtml(f.session)}</div>
+                    <div class="vo-size" style="margin-top:2px;">${new Date(f.savedAt).toLocaleString()}</div>
+                    <div class="vo-actions">
+                        <a href="/admin/view-once/file/${encodeURIComponent(f.fileName)}" download class="btn btn-g btn-sm" style="text-decoration:none;" onclick="addAuthToLink(event)"><i class="fas fa-download"></i></a>
+                        <button class="btn btn-r btn-sm" onclick="deleteVO('${f.fileName}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('')}</div>`;
+    } catch(e) { gallery.innerHTML = `<div style="color:var(--r);padding:20px;">${e.message}</div>`; }
+}
+async function deleteVO(fn) {
+    if (!confirm('Delete this file?')) return;
+    const d = await api('DELETE', `/view-once/file/${encodeURIComponent(fn)}`);
+    if (d.success) { toast('File deleted', 'success'); loadViewOnce(); }
+    else toast(d.error || 'Failed', 'error');
+}
+function addAuthToLink(e) {
+    e.preventDefault();
+    const url = e.currentTarget.href;
+    fetch(url, { headers: { 'Authorization': `Basic ${AUTH_TOKEN}` } })
+        .then(r => r.blob())
+        .then(blob => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = url.split('/').pop();
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }).catch(e => toast('Download failed: ' + e.message, 'error'));
+}
+
+// ── Media Scraper ─────────────────────────────────────────
+async function scrapeMedia() {
+    const sessionNumber = document.getElementById('mediaSession').value.trim();
+    const targetJid = document.getElementById('mediaTarget').value.trim();
+    const limit = parseInt(document.getElementById('mediaLimit').value) || 50;
+    if (!sessionNumber || !targetJid) return showAlert('mediaAlert', 'Session and target required.', 'error');
+    showAlert('mediaAlert', 'Scraping media...', 'info');
+    const d = await api('POST', '/media-scraper', { sessionNumber, targetJid, limit });
+    const box = document.getElementById('mediaResult');
+    box.className = 'result-box show';
+    if (d.success) {
+        showAlert('mediaAlert', `✅ Downloaded ${d.downloaded} files to server.`, 'success');
+        box.textContent = d.files.map(f => `${f.mediaType}: ${f.fileName} (${f.size} bytes)`).join('\n') || 'No media found.';
+        toast(`${d.downloaded} files scraped`, 'success');
+    } else { showAlert('mediaAlert', d.error || 'Failed', 'error'); box.textContent = d.error || 'Failed'; }
+}
+
+// ── Block ─────────────────────────────────────────────────
+async function blockAction(action) {
+    const sessionNumber = document.getElementById('blockSession').value.trim();
+    const targetNumber = document.getElementById('blockTarget').value.trim();
+    if (!sessionNumber || !targetNumber) return showAlert('blockAlert', 'Session and target required.', 'error');
+    const d = await api('POST', '/block', { sessionNumber, targetNumber, action });
+    if (d.success) { showAlert('blockAlert', `✅ ${action === 'block' ? 'Blocked' : 'Unblocked'} ${targetNumber}`, 'success'); toast(`${action} ok`, 'success'); }
+    else showAlert('blockAlert', d.error || 'Failed', 'error');
+}
+async function loadBlocklist() {
+    const num = document.getElementById('blocklistSession').value.trim();
+    if (!num) return;
+    const el = document.getElementById('blocklistResult');
+    el.innerHTML = 'Loading...';
+    const d = await api('GET', `/blocklist/${num}`);
+    if (d.success) {
+        if (!d.blocklist?.length) { el.innerHTML = '<span style="color:var(--muted2)">No blocked contacts.</span>'; return; }
+        el.innerHTML = d.blocklist.map(jid => `<div style="padding:4px 0;font-size:12.5px;border-bottom:1px solid var(--border)"><code style="color:var(--r)">${escHtml(jid)}</code></div>`).join('');
+    } else el.textContent = d.error || 'Failed';
+}
+
+// ── Keywords ──────────────────────────────────────────────
+async function saveKeywords() {
+    const sessionNumber = document.getElementById('kwSession').value.trim();
+    const raw = document.getElementById('kwList').value.trim();
+    if (!sessionNumber) return showAlert('kwAlert', 'Session required.', 'error');
+    const keywords = raw.split('\n').map(k => k.trim()).filter(Boolean);
+    const d = await api('POST', '/keyword-alerts', { sessionNumber, keywords });
+    if (d.success) { showAlert('kwAlert', `✅ ${keywords.length} keywords saved!`, 'success'); toast('Keyword alerts saved', 'success'); }
+    else showAlert('kwAlert', d.error || 'Failed', 'error');
+}
+async function loadKeywords() {
+    const sessionNumber = document.getElementById('kwSession').value.trim();
+    if (!sessionNumber) return showAlert('kwAlert', 'Session required.', 'error');
+    const d = await api('GET', `/keyword-alerts/${sessionNumber}`);
+    if (d.success) {
+        document.getElementById('kwList').value = (d.keywords || []).join('\n');
+        showAlert('kwAlert', `Loaded ${d.keywords?.length || 0} keywords.`, 'info');
+    } else showAlert('kwAlert', d.error || 'Failed', 'error');
+}
+
+// ── Backup ────────────────────────────────────────────────
+async function listChats() {
+    const num = document.getElementById('backupSession').value.trim();
+    if (!num) return;
+    const tbody = document.getElementById('chatsList');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:12px">Loading...</td></tr>';
+    const d = await api('GET', `/backup/chats/${num}`);
+    if (!d.chats?.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted2);padding:20px">No chats found.</td></tr>'; return; }
+    tbody.innerHTML = d.chats.map(c =>
+        `<tr>
+            <td>${escHtml(c.name)}</td>
+            <td><span class="badge badge-blue">${c.type}</span></td>
+            <td>${c.participants || '-'}</td>
+            <td>
+                <button class="btn btn-ghost btn-sm" onclick="downloadChatQuick('${num}','${c.jid}','${escHtml(c.name)}','json')">JSON</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadChatQuick('${num}','${c.jid}','${escHtml(c.name)}','txt')">TXT</button>
+            </td>
+        </tr>`
+    ).join('');
+}
+async function downloadChatQuick(sessionNumber, targetJid, chatName, format) {
+    toast(`Preparing ${format} download...`, 'info');
+    const res = await fetch('/admin/backup/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${AUTH_TOKEN}` },
+        body: JSON.stringify({ sessionNumber, targetJid, chatName, format })
+    });
+    triggerDownload(res, `chat_${sessionNumber}_${Date.now()}.${format}`);
+}
+async function downloadChat() {
+    const sessionNumber = document.getElementById('dlSession').value.trim();
+    const targetJid = document.getElementById('dlJid').value.trim();
+    const chatName = document.getElementById('dlName').value.trim();
+    const format = document.getElementById('dlFormat').value;
+    if (!sessionNumber) return toast('Session required', 'error');
+    toast('Preparing download...', 'info');
+    const res = await fetch('/admin/backup/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${AUTH_TOKEN}` },
+        body: JSON.stringify({ sessionNumber, targetJid: targetJid || undefined, chatName, format })
+    });
+    triggerDownload(res, `backup_${sessionNumber}.${format}`);
+}
+async function exportSession() {
+    const num = document.getElementById('sessExportNum').value.trim();
+    const fmt = document.getElementById('sessExportFmt').value;
+    if (!num) return toast('Session required', 'error');
+    toast('Exporting session...', 'info');
+    const res = await apiDownload(`/backup/session/${num}?format=${fmt}`);
+    triggerDownload(res, `session_${num}.${fmt}`);
+}
+async function triggerDownload(res, fallbackName) {
+    const blob = await res.blob();
+    const cd = res.headers.get('Content-Disposition') || '';
+    const m = cd.match(/filename="?([^"]+)"?/);
+    const fn = m ? m[1] : fallbackName;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fn;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('Download: ' + fn, 'success');
+}
+
+// ── Contacts ──────────────────────────────────────────────
+async function previewContacts() {
+    const num = document.getElementById('contactSession').value.trim();
+    if (!num) return showAlert('contactAlert', 'Session required.', 'error');
+    showAlert('contactAlert', 'Loading...', 'info');
+    const d = await api('GET', `/contacts/${num}`);
+    const preview = document.getElementById('contactPreview');
+    if (d.contacts?.length) {
+        preview.innerHTML = `<div style="margin-bottom:10px;font-size:13px;font-weight:600">Found <span style="color:var(--g)">${d.total}</span> contacts</div>` +
+            d.contacts.slice(0, 100).map(c =>
+                `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px;display:flex;justify-content:space-between;">
+                    <code style="color:var(--c)">+${escHtml(c.number)}</code>
+                    <span style="color:var(--muted2)">${escHtml(c.source)}</span>
+                </div>`
+            ).join('') + (d.total > 100 ? `<div style="text-align:center;padding:8px;color:var(--muted2);font-size:12px">...and ${d.total - 100} more</div>` : '');
+        showAlert('contactAlert', `✅ ${d.total} contacts`, 'success');
+    } else showAlert('contactAlert', d.error || 'No contacts found', 'error');
+}
+async function exportContacts(format) {
+    const num = document.getElementById('contactSession').value.trim();
+    if (!num) return showAlert('contactAlert', 'Session required.', 'error');
+    toast(`Exporting as ${format}...`, 'info');
+    const res = await apiDownload(`/contacts/export/${num}?format=${format}`);
+    triggerDownload(res, `contacts_${num}.${format}`);
+}
+
+// ── Auto-refresh ──────────────────────────────────────────
+setInterval(() => {
+    if (document.getElementById('adminPage').style.display !== 'none') refreshStats();
+}, 30000);
+
+// ── CSS spin ──────────────────────────────────────────────
+const sty = document.createElement('style');
+sty.textContent = '@keyframes spin{to{transform:rotate(360deg);}}';
+document.head.appendChild(sty);
+</script>
+</body>
+</html>
